@@ -5,6 +5,8 @@ const GoodsList = require('../mongodb/schema/goods')
 const User = require('../mongodb/schema/user')
 const Address = require('../mongodb/schema/address')
 const Collection = require('../mongodb/schema/collection')
+const ShopList = require('../mongodb/schema/shopList')
+
 const md5 = require("md5")
 // 首页
 router.get('/recommend', async (ctx, next) => {
@@ -272,6 +274,55 @@ router.post('/cancelCollection', async (ctx, next) => {
       status: 200,
       msg: '取消收藏成功'
     }
+  }
+})
+
+// 加入购物车
+router.post('/addShop', async (ctx, next) => {
+  if (!ctx.request.body.id) {
+    ctx.body = {
+      code: -1,
+      msg: '缺少参数id'
+    }
+    return
+  }
+  // 单价 id image_path 商品名字
+  // 先查数据库有没有这条商品,有就数量加1,没有就新创建一条
+  let data = await ShopList.findOne({ id: ctx.request.body.id, username: ctx.session.username }).exec()
+  if (data && data.id && data.id == ctx.request.body.id && data.username == ctx.session.username) {  // 说明数据库有这条数据了
+    data.count++        // 数量加一
+    data.mallPrice = (data.count * data.present_price).toFixed(2)
+    await new ShopList(data).save()
+  } else {    //  如果没有这条数据，说明是第一次添加
+    // 查到这条商品数据
+    let goods = await GoodsList.findOne({ id: ctx.request.body.id }).exec()
+    const { present_price, id, image_path, name } = goods
+    let shop = {
+      present_price,
+      id,
+      image_path,
+      name,
+      mallPrice: present_price,
+      check: false,
+      count: 1,
+      username: ctx.session.username
+    }
+    await new ShopList(shop).save()
+  }
+  ctx.body = {
+    status: 200,
+    msg: '加入购物车成功'
+  }
+})
+
+// 查询购物车
+router.get('/getShop', async (ctx, next) => {
+  console.log(ctx.session.username);
+
+  const res = await ShopList.find({ username: ctx.session.username })
+  ctx.body = {
+    status: 200,
+    shopList: res || []
   }
 })
 module.exports = router

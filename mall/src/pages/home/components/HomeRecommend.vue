@@ -26,6 +26,7 @@ Vue.use(VueAwesomeSwiper).use(Icon )
 import {details} from 'js/mixin'
 import axios from 'axios'
 import {mapGetters} from 'vuex'
+import {Toast} from 'vant'
 export default {
     mixins: [details],
     props:['recommend'],
@@ -49,14 +50,17 @@ export default {
     },
  
     methods: {
-        addShops(val) {
+        async addShops(val) {
             if (!this.userName) {
                 this.$router.push({path:'/user/login'})
                 return
             }
-            console.log(val);
-            
-            // addShop(val,this)
+            const res = await axios.post('/api/addShop',{
+                id: val.goodsId
+            })            
+            if (res.data.status == 200) {
+                Toast(res.data.msg)
+            }
         }
     }
   }
