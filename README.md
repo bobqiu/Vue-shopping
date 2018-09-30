@@ -50,7 +50,7 @@
 ![2.png](./images/2.png)
 ![6.png](./images/6.png)
 ![7.png](./images/7.png)
-![1.png](./images/8.png)
+![1.png](./images/1.png)
 
 
 
