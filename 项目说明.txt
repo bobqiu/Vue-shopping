@@ -1,0 +1,7 @@
+项目说明：
+1，分别进入mall和server 目录下打开cmd  安装依赖
+2，server目录再运行index1.js 和 index2.js 把商品写入数据库，需要先安装mongodb数据库
+3，浏览器打开http://localhost:8080既可看到项目
+4，部分功能正在制作中......
+github地址：https://github.com/yzbgyq/shoppingMall
+欢迎Issues和交流

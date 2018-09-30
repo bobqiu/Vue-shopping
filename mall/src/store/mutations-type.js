@@ -1,0 +1,5 @@
+export const CATEGORY = 'CATEGORY'
+export const GOODSDETAILS = 'GOODSDETAILS'
+export const USERNAME = 'USERNAME'
+export const ADDRESSINFO = 'ADDRESSINFO'
+export const BROWSE = 'BROWSE'

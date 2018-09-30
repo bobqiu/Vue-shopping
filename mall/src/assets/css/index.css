@@ -1,0 +1,51 @@
+.van-search .van-cell{
+    align-items: center
+}
+.van-tabs__wrap--scrollable .van-tab {
+    flex: 0 0 25%;
+}
+
+.van-tabs__content {
+    position: fixed;
+    top: 84px;
+    bottom: 50px;
+    right: 0;
+    left:80px
+}
+
+.bounce-enter-active {
+    animation: bounce-in .3s;
+        }
+    .bounce-leave-active {
+            animation: bounce-in .3s reverse;
+            }
+    @keyframes bounce-in {
+    0% {
+        transform: translate3d(100%,0,0)
+        }
+    
+    100% {
+        transform: translate3d(0,0,0)
+        }
+} 
+.van-goods-action {
+    z-index: 1000;
+}
+
+.datails-tabs .van-tabs__content {
+    position: initial;
+}
+.van-address-list {
+    padding-bottom: 0;
+}
+.van-address-list__add {
+    display: none;
+}
+.null {
+    text-align: center;
+    color: #bbbbbb;
+    font-size: 16px;
+    margin-top: 50px;
+    letter-spacing: 2px;
+}
+          
