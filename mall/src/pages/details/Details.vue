@@ -84,16 +84,36 @@
       </van-goods-action-big-btn>
     </van-goods-action>
     <Back/>
-    <van-sku
-      v-model="showBase"
-      :sku="sku"
-      :goods="goods"
-      :goods-id="goods.id"
-      :quota="quota"
-      :show-add-cart-btn='false'
-      @buy-clicked="onBuyClicked"
-      @add-cart="onAddCartClicked"
-    />
+    <transition name='bounce2'>
+      <div class="sku" v-show="showBase" :class="{sku2:showBase}">
+        <van-icon name="close" class="close" @click="showBase=false"/>
+        <div class="goods-top border-bottom">
+          <img :src="goods.image_path" class="image_path" :onerror="defaultImg">
+          <div class="goods-right">
+            <p class="goods-name">{{goods.name}}</p>
+            <p class="pic">
+              <span>￥</span>
+              <span>{{goods.present_price}}</span>
+            </p>
+          </div>
+        </div>
+        <div class="goods-bottom border-bottom">
+            <div class="left">
+              <p class="num">购买数量：</p>
+              <p class="totle">剩余 {{goods.amount}} 件 <span>每人限购15件</span></p>
+            </div>
+            <div class="right">
+              <button class="van-stepper__minus add" @click="minus" :class="{'van-stepper__minus--disabled':count==1}"></button>
+              <input type="number" disabled class="van-stepper__input" v-model="count">
+              <button class="van-stepper__plus" @click="plus" :class="{'van-stepper__plus--disabled':count==15}"></button>
+            </div>
+        </div>
+        <div class="bottom">立即购买</div>
+      </div>
+    </transition>  
+    <transition name="fade">
+        <div class="sku-layer" v-show="showBase" @click="showBase=false"></div>
+    </transition>
   </div>
   </transition>  
 </template>
@@ -135,47 +155,13 @@ export default {
   data() {
     return {
       goods: { },
-      quota: 15,  //限购数量
       defaultImg: 'this.src="' + require('../../assets/img/vue.jpg') + '"',
       active: 0,
       item: [{id:0,title:'商品详情'},{id:1,title:'商品评论'}],
       isCollectionFlag: false,
       showBase:false,  // 显示sku
-      goods: {
-        // 商品标题
-        title: '测试商品',
-        // 默认商品 sku 缩略图
-        picture: 'https://img.yzcdn.cn/1.jpg'
-      },
-      sku: {
-        // 所有sku规格类目与其值的从属关系，比如商品有颜色和尺码两大类规格，颜色下面又有红色和蓝色两个规格值。
-        // 可以理解为一个商品可以有多个规格类目，一个规格类目下可以有多个规格值。
-        tree: [
-          {
-            k: '颜色', // skuKeyName：规格类目名称
-         
-            k_s: 's1' // skuKeyStr：sku 组合列表（下方 list）中当前类目对应的 key 值，value 值会是从属于当前类目的一个规格值 id
-          }
-        ],
-        // 所有 sku 的组合列表，比如红色、M 码为一个 sku 组合，红色、S 码为另一个组合
-        list: [
-          {
-            id: 2259, // skuId，下单时后端需要
-            price: 100, // 价格（单位分）
-            s1: '1215', // 规格类目 k_s 为 s1 的对应规格值 id
-            s2: '1193', // 规格类目 k_s 为 s2 的对应规格值 id
-            s3: '0', // 最多包含3个规格值，为0表示不存在该规格
-            stock_num: 110 // 当前 sku 组合对应的库存
-          }
-        ],
-        price: '1.00', // 默认价格（单位元）
-        stock_num: 227, // 商品总库存
-        collection_id: 2261, // 无规格商品 skuId 取 collection_id，否则取所选 sku 组合对应的 id
-        none_sku: true, // 是否无规格商品
-
-        hide_stock: 1000 // 是否隐藏剩余库存
-      }
-    };
+      count: 1
+    }
   },
   
   computed: {
@@ -259,18 +245,25 @@ export default {
 
     // 立即购买弹出sku
     purchase() {
-      console.log(1);
-      
       this.showBase = true
     },
 
-    // 立即购买
-    onBuyClicked() {
-
+    // 减少数量
+    minus() {
+      if (this.count == 1) {
+        Toast('至少选择1件~~')
+        return
+      }
+      this.count--
     },
 
-    onAddCartClicked() {
-
+    // 增加数量
+    plus() {
+      if (this.count >= 15) {
+        Toast('最多选择15件噢~~')
+        return
+      }
+      this.count++
     },
 
     ...mapActions(['setBrowse'])
@@ -289,6 +282,105 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
+.sku {
+  height: 250px;
+  background: #fff;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1001;
+  .close {
+    position: absolute;
+    right: 0%;
+    top: 0%;
+    font-size: 18px;
+    z-index: 200;
+    padding: 10px;
+  }
+  .goods-top {
+    position: relative;
+    height: 90px;
+    display: flex;
+    .image_path {
+      flex: 0 0 80px;
+      transform: translate3d(16px,-10px,0);
+      width: 80px;
+      height: 80px;
+      border: 1px solid #eee;
+    }
+    .goods-right {
+      padding-left: 30px;
+      flex: 1;
+      .goods-name {
+        font-size: 14px;
+        margin-top: 10px;
+        padding-right: 35px;
+        line-height: 1.4;
+      }
+      .pic {
+        margin-top: 10px;
+        color: #FF4444;
+        font-size: 14px;
+      }
+    }
+  }
+  .goods-bottom {
+    height: 70px;
+    padding: 10px 16px 10px 16px;
+    box-sizing: border-box;
+    display: flex;
+    .left {
+      flex: 0 0 60%;
+      width: 60%;
+      .num {
+        font-size: 14px;
+      }
+      .totle {
+        margin-top: 15px;
+        color: #999;
+        font-size: 12px;
+        span {
+          color: #f44;
+          margin-left: 10px;
+          font-size: 12px
+        }
+      }
+    }
+    .right {
+      flex: 1;
+      font-size: 0;
+      botton {
+        display: inline-block;
+        width: 40px;
+      }
+    }
+  }
+  .bottom {
+      height: 50px;
+      background: #f44;
+      text-align: center;
+      line-height: 50px;
+      font-size: 16px;
+      color: #fff;
+      letter-spacing: 2px;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+}
+
+.sku-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 1000;
+}
 .goods {
   padding-bottom: 50px;
   background: #fff;
@@ -404,4 +496,25 @@ export default {
     color: red;
   }
 }
+.bounce2-enter-active {
+    animation: bounce-in .3s;
+}
+.bounce2-leave-active {
+    animation: bounce-in .3s reverse;
+}
+@keyframes bounce-in {
+    0% {
+        transform: translate3d(0,100%,0)
+    }
+    
+    100% {
+        transform: translate3d(0,0,0)
+    }
+}
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+} 
 </style>
