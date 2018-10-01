@@ -1,0 +1,64 @@
+.van-toast {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	color: #fff;
+	font-size: 24px;
+	line-height: 1.2;
+	border-radius: 10px;
+	word-break: break-all;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	align-items: center;
+	-webkit-box-pack: center;
+	-webkit-justify-content: center;
+	justify-content: center;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	box-sizing: border-box;
+	-webkit-transform: translate3d(-50%, -50%, 0);
+	transform: translate3d(-50%, -50%, 0);
+	background-color: rgba(0, 0, 0, .7)
+}
+
+.van-toast--unclickable {
+	pointer-events: none
+}
+
+.van-toast--text {
+	padding: 24px;
+	min-width: 440px
+}
+
+.van-toast--default {
+	width: 240px;
+	min-height: 240px;
+	padding: 30px
+}
+
+.van-toast--default .van-toast__icon {
+	font-size: 100px
+}
+
+.van-toast--default .van-loading {
+	margin: 20px 0 10px
+}
+
+.van-toast--default .van-toast__text {
+	font-size: 28px;
+	padding-top: 20px
+}
+
+.van-toast--top {
+	top: 100px
+}
+
+.van-toast--bottom {
+	top: auto;
+	bottom: 100px
+}

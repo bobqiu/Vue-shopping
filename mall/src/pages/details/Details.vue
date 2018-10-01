@@ -76,15 +76,24 @@
       <van-goods-action-mini-btn icon="cart" @click="onClickCart">
         购物车
       </van-goods-action-mini-btn>
-      <van-goods-action-big-btn>
+      <van-goods-action-big-btn @click="addShops">
         加入购物车
       </van-goods-action-big-btn>
-      <van-goods-action-big-btn primary>
+      <van-goods-action-big-btn primary @click="purchase">
         立即购买
       </van-goods-action-big-btn>
     </van-goods-action>
     <Back/>
-
+    <van-sku
+      v-model="showBase"
+      :sku="sku"
+      :goods="goods"
+      :goods-id="goods.id"
+      :quota="quota"
+      :show-add-cart-btn='false'
+      @buy-clicked="onBuyClicked"
+      @add-cart="onAddCartClicked"
+    />
   </div>
   </transition>  
 </template>
@@ -103,10 +112,10 @@ import {
   GoodsAction,
   GoodsActionBigBtn,
   GoodsActionMiniBtn,
-  Tab, Tabs
+  Tab, Tabs,Sku
 } from 'vant';
 import Back from 'pages/other/Back'
-Vue.use(Tab).use(Tabs);
+Vue.use(Tab).use(Tabs).use(Sku)
 import {mapGetters,mapActions} from 'vuex'
 import axios from 'axios'
 export default {
@@ -126,10 +135,46 @@ export default {
   data() {
     return {
       goods: { },
+      quota: 15,  //限购数量
       defaultImg: 'this.src="' + require('../../assets/img/vue.jpg') + '"',
       active: 0,
       item: [{id:0,title:'商品详情'},{id:1,title:'商品评论'}],
-      isCollectionFlag: false
+      isCollectionFlag: false,
+      showBase:false,  // 显示sku
+      goods: {
+        // 商品标题
+        title: '测试商品',
+        // 默认商品 sku 缩略图
+        picture: 'https://img.yzcdn.cn/1.jpg'
+      },
+      sku: {
+        // 所有sku规格类目与其值的从属关系，比如商品有颜色和尺码两大类规格，颜色下面又有红色和蓝色两个规格值。
+        // 可以理解为一个商品可以有多个规格类目，一个规格类目下可以有多个规格值。
+        tree: [
+          {
+            k: '颜色', // skuKeyName：规格类目名称
+         
+            k_s: 's1' // skuKeyStr：sku 组合列表（下方 list）中当前类目对应的 key 值，value 值会是从属于当前类目的一个规格值 id
+          }
+        ],
+        // 所有 sku 的组合列表，比如红色、M 码为一个 sku 组合，红色、S 码为另一个组合
+        list: [
+          {
+            id: 2259, // skuId，下单时后端需要
+            price: 100, // 价格（单位分）
+            s1: '1215', // 规格类目 k_s 为 s1 的对应规格值 id
+            s2: '1193', // 规格类目 k_s 为 s2 的对应规格值 id
+            s3: '0', // 最多包含3个规格值，为0表示不存在该规格
+            stock_num: 110 // 当前 sku 组合对应的库存
+          }
+        ],
+        price: '1.00', // 默认价格（单位元）
+        stock_num: 227, // 商品总库存
+        collection_id: 2261, // 无规格商品 skuId 取 collection_id，否则取所选 sku 组合对应的 id
+        none_sku: true, // 是否无规格商品
+
+        hide_stock: 1000 // 是否隐藏剩余库存
+      }
     };
   },
   
@@ -197,6 +242,35 @@ export default {
           this.isCollectionFlag = true
         }
       }
+    },
+
+    async addShops() {
+            if (!this.userName) {
+                this.$router.push({path:'/user/login'})
+                return
+            }
+            const res = await axios.post('/api/addShop',{
+                id: this.goodsDetails.goodsId || this.goodsDetails.id
+            })            
+            if (res.data.status == 200) {
+                Toast(res.data.msg)
+            }
+    },
+
+    // 立即购买弹出sku
+    purchase() {
+      console.log(1);
+      
+      this.showBase = true
+    },
+
+    // 立即购买
+    onBuyClicked() {
+
+    },
+
+    onAddCartClicked() {
+
     },
 
     ...mapActions(['setBrowse'])
