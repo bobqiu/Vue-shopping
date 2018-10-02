@@ -102,13 +102,9 @@
               <p class="num">购买数量：</p>
               <p class="totle">剩余 {{goods.amount}} 件 <span>每人限购15件</span></p>
             </div>
-            <div class="right">
-              <button class="van-stepper__minus add" @click="minus" :class="{'van-stepper__minus--disabled':count==1}"></button>
-              <input type="number" disabled class="van-stepper__input" v-model="count">
-              <button class="van-stepper__plus" @click="plus" :class="{'van-stepper__plus--disabled':count==15}"></button>
-            </div>
+            <AdditionAndSubtraction @count='count'/>
         </div>
-        <div class="bottom">立即购买</div>
+        <div class="bottom" @click="PurchaseImmediately">立即购买</div>
       </div>
     </transition>  
     <transition name="fade">
@@ -138,6 +134,7 @@ import Back from 'pages/other/Back'
 Vue.use(Tab).use(Tabs).use(Sku)
 import {mapGetters,mapActions} from 'vuex'
 import axios from 'axios'
+import AdditionAndSubtraction from 'pages/other/AdditionAndSubtraction'
 export default {
   components: {
     [Tag.name]: Tag,
@@ -150,7 +147,8 @@ export default {
     [GoodsAction.name]: GoodsAction,
     [GoodsActionBigBtn.name]: GoodsActionBigBtn,
     [GoodsActionMiniBtn.name]: GoodsActionMiniBtn,
-    Back
+    Back,
+    AdditionAndSubtraction
   },
   data() {
     return {
@@ -160,7 +158,7 @@ export default {
       item: [{id:0,title:'商品详情'},{id:1,title:'商品评论'}],
       isCollectionFlag: false,
       showBase:false,  // 显示sku
-      count: 1
+      newCount: 1,
     }
   },
   
@@ -248,22 +246,14 @@ export default {
       this.showBase = true
     },
 
-    // 减少数量
-    minus() {
-      if (this.count == 1) {
-        Toast('至少选择1件~~')
-        return
-      }
-      this.count--
+    count(newCount) {
+      this.newCount = newCount
     },
 
-    // 增加数量
-    plus() {
-      if (this.count >= 15) {
-        Toast('最多选择15件噢~~')
-        return
-      }
-      this.count++
+    // 立即购买
+    PurchaseImmediately() {
+      console.log(this.newCount);
+      
     },
 
     ...mapActions(['setBrowse'])
@@ -348,14 +338,7 @@ export default {
         }
       }
     }
-    .right {
-      flex: 1;
-      font-size: 0;
-      botton {
-        display: inline-block;
-        width: 40px;
-      }
-    }
+
   }
   .bottom {
       height: 50px;

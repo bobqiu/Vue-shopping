@@ -14,7 +14,7 @@ import 'css/reset.css'
 import 'swiper/dist/css/swiper.css'
 import 'css/border.css'
 import 'css/index.css'
-
+import 'css/icon.styl'
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

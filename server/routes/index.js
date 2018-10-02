@@ -291,7 +291,7 @@ router.post('/addShop', async (ctx, next) => {
   let data = await ShopList.findOne({ id: ctx.request.body.id, username: ctx.session.username }).exec()
   if (data && data.id && data.id == ctx.request.body.id && data.username == ctx.session.username) {  // 说明数据库有这条数据了
     data.count++        // 数量加一
-    data.mallPrice = (data.count * data.present_price).toFixed(2)
+    data.mallPrice = data.present_price
     await new ShopList(data).save()
   } else {    //  如果没有这条数据，说明是第一次添加
     // 查到这条商品数据
@@ -316,13 +316,34 @@ router.post('/addShop', async (ctx, next) => {
 })
 
 // 查询购物车
-router.get('/getShop', async (ctx, next) => {
-  console.log(ctx.session.username);
-
+router.get('/getCard', async (ctx, next) => {
   const res = await ShopList.find({ username: ctx.session.username })
   ctx.body = {
     status: 200,
     shopList: res || []
   }
 })
+
+// 购物车增加和减少
+router.post('/editCart', async (ctx, next) => {
+  const { count, id, mallPrice } = ctx.request.body
+  await ShopList.findOneAndUpdate({ username: ctx.session.username, id }, { id, count, mallPrice })
+  ctx.body = {
+    status: 200,
+    msg: '修改成功'
+  }
+})
+
+// 购物车的删除
+router.post('/deleteShop', async (ctx, next) => {
+  let id = ctx.request.body
+  id.forEach(ids => {
+    ShopList.findOneAndDelete({ id: ids,username: ctx.session.username }).exec()
+    ctx.body = {
+      status: 200,
+      msg: '删除成功'
+    }
+  })
+})
+
 module.exports = router
