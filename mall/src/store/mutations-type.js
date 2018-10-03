@@ -3,3 +3,5 @@ export const GOODSDETAILS = 'GOODSDETAILS'
 export const USERNAME = 'USERNAME'
 export const ADDRESSINFO = 'ADDRESSINFO'
 export const BROWSE = 'BROWSE'
+export const SHOPORDERLIST = 'SHOPORDERLIST'
+

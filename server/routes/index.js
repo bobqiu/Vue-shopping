@@ -2,16 +2,14 @@ const router = require('koa-router')()
 const mongoose = require('mongoose')
 const Goods = require('../mongodb/schema/home')
 const GoodsList = require('../mongodb/schema/goods')
-const User = require('../mongodb/schema/user')
+// const User = require('../mongodb/schema/user')
 const Address = require('../mongodb/schema/address')
 const Collection = require('../mongodb/schema/collection')
 const ShopList = require('../mongodb/schema/shopList')
-
+const userTest = require('../mongodb/schema/user2')
 const md5 = require("md5")
 // 首页
 router.get('/recommend', async (ctx, next) => {
-  console.log(ctx.session.username);
-
   const res = await Goods.find({})
   ctx.body = res[0]
   if (res) {
@@ -63,11 +61,34 @@ router.get('/goods/one', async (ctx, next) => {
 })
 
 // 注册
+// router.post('/register', async (ctx, next) => {
+//   const { username, password } = ctx.request.body
+//   let data = await User.findOne({ username })
+//   if (!data) {
+//     await new User({
+//       username,
+//       password: md5(password)
+//     }).save()
+//     ctx.body = {
+//       code: 200,
+//       msg: '注册成功'
+//     }
+//     ctx.session['login'] = 1
+//     ctx.session['username'] = username
+//   } else {
+//     if (data.username === username) {
+//       ctx.body = {
+//         code: -1,
+//         msg: '用户名已存在'
+//       }
+//     }
+//   }
+// })
 router.post('/register', async (ctx, next) => {
   const { username, password } = ctx.request.body
-  let data = await User.findOne({ username })
+  let data = await userTest.findOne({ username })
   if (!data) {
-    await new User({
+    await new userTest({
       username,
       password: md5(password)
     }).save()
@@ -90,8 +111,8 @@ router.post('/register', async (ctx, next) => {
 // 登录
 router.post('/login', async (ctx, next) => {
   const { username, password } = ctx.request.body
-  let data = await User.findOne({ username }) //拿到用户名查询数据库
-  if (!data) {  //说明数据库没有这个名字
+  let data = await userTest.findOne({ username }) //拿到用户名查询数据库
+  if (!data.username) {  //说明数据库没有这个名字
     ctx.body = {
       code: -1,
       msg: '用户名不存在',
@@ -148,18 +169,26 @@ router.post('/address', async (ctx, next) => {
       msg: '请先登录'
     }
   } else {
-    if (data.id) {  // 说明是更新地址
-      const res = await Address.findOneAndUpdate({ id: data.id }, data)
+    const username = ctx.session.username
+    if (data.id) {    // 说明是更新地址
+      await userTest.findOneAndUpdate({ username, 'addressList.id': data.id }, {
+        $set: {
+          'addressList.$': data
+        }
+      })
       ctx.body = {
         status: 200,
-        msg: '更新成功',
-        data: res
+        msg: '更新成功'
       }
-    } else { // 说明是新增地址
+    } else {  // 新增地址
       const data2 = Object.assign(data, {
         id: String(+Date.now())
+      })    // 地址id
+      await userTest.findOneAndUpdate({ username }, {
+        $push: {
+          'addressList': data2
+        }
       })
-      await new Address(data2).save()
       ctx.body = {
         status: 200,
         msg: '添加成功'
@@ -170,16 +199,16 @@ router.post('/address', async (ctx, next) => {
 
 // 查询地址
 router.get('/getAddress', async (ctx, next) => {
-
   if (ctx.session.login != 1) { // 没有登录
     ctx.body = {
       status: -1,
       msg: '请先登录'
     }
   } else {
-    const res = await Address.find({ username: ctx.session.username })
+    const res = await userTest.findOne({ username: ctx.session.username }).exec()
     ctx.body = {
-      address: res
+      status: 200,
+      address: res.addressList
     }
   }
 })
@@ -192,7 +221,13 @@ router.post('/deleteAddress', async (ctx, next) => {
       msg: '请先登录'
     }
   } else {
-    await Address.remove({ id: ctx.request.body.id })
+    await userTest.findOneAndUpdate({ username: ctx.session.username }, {
+      $pull: {
+        'addressList': {
+          'id': ctx.request.body.id
+        }
+      }
+    })
     ctx.body = {
       code: 200,
       msg: '删除成功'
@@ -203,41 +238,50 @@ router.post('/deleteAddress', async (ctx, next) => {
 // 查询是否已经收藏
 router.post('/isCollection', async (ctx, next) => {
   const res = ctx.request.body
+  const username = ctx.session.username
   if (ctx.session.login != 1) { // 没有登录
     ctx.body = {
       status: -1,
       msg: '请先登录'
     }
   } else {
-    const result = await Collection.find({ username: ctx.session.username }).exec()
+    const result = await userTest.findOne({ username }).exec()
     let isCollection
     if (!res || !res.id) {
       isCollection = 0  // 未收藏
     } else {
-      if (result.username === ctx.session.username) {  // 判断是不是同一个用户
-        isCollection = 1
+      if (result.collections.length) {
+        result.collections.forEach(item => {
+          if (item.id === res.id) {
+            isCollection = 1
+          } else {
+            isCollection = 0
+          }
+        })
       } else {
         isCollection = 0
       }
     }
     ctx.body = {
       status: 200,
-      isCollection,
+      isCollection
     }
   }
 })
-// 查询用户收藏
+
+// 查询用户收藏列表
 router.get('/collection/list', async (ctx, next) => {
+  const username = ctx.session.username
   if (ctx.session.login != 1) { // 没有登录
     ctx.body = {
       status: -1,
       msg: '请先登录'
     }
   } else {
-    const result = await Collection.find({ username: ctx.session.username }).exec()
+    const result = await userTest.findOne({ username }).exec()
     ctx.body = {
       status: 200,
-      collection: result || []
+      collection: result.collections || []
     }
   }
 
@@ -246,14 +290,18 @@ router.get('/collection/list', async (ctx, next) => {
 // 用户收藏，加入数据库
 router.post('/collection', async (ctx, next) => {
   const data = ctx.request.body
+  const username = ctx.session.username
   if (ctx.session.login != 1) {
     ctx.body = {
       status: -1,
       msg: '请先登录'
     }
   } else {
-    data['username'] = ctx.session.username
-    await new Collection(data).save()
+    await userTest.findOneAndUpdate({ username }, {
+      $push: {
+        'collections': data
+      }
+    })
     ctx.body = {
       status: 200,
       msg: '收藏成功'
@@ -269,7 +317,13 @@ router.post('/cancelCollection', async (ctx, next) => {
       msg: '请先登录'
     }
   } else {
-    await Collection.remove({ id: ctx.request.body.id })
+    await userTest.findOneAndUpdate({ username: ctx.session.username }, {
+      $pull: {
+        'collections': {
+          'id': ctx.request.body.id
+        }
+      }
+    })
     ctx.body = {
       status: 200,
       msg: '取消收藏成功'
@@ -286,14 +340,20 @@ router.post('/addShop', async (ctx, next) => {
     }
     return
   }
+  const username = ctx.session.username
   // 单价 id image_path 商品名字
   // 先查数据库有没有这条商品,有就数量加1,没有就新创建一条
-  let data = await ShopList.findOne({ id: ctx.request.body.id, username: ctx.session.username }).exec()
-  if (data && data.id && data.id == ctx.request.body.id && data.username == ctx.session.username) {  // 说明数据库有这条数据了
-    data.count++        // 数量加一
-    data.mallPrice = data.present_price
-    await new ShopList(data).save()
-  } else {    //  如果没有这条数据，说明是第一次添加
+  const test = await userTest.aggregate([{ "$unwind": "$shopList" },
+  { "$match": { "shopList.id": ctx.request.body.id } },
+  { "$project": { "shopList": 1 } }])
+  let newData = test.length && test[0].shopList
+  if (newData) {
+    await userTest.findOneAndUpdate({ username, 'shopList.id': ctx.request.body.id }, {
+      $set: {
+        'shopList.$.count': newData.count += 1
+      }
+    })
+  } else {  // 说明没有这条数据
     // 查到这条商品数据
     let goods = await GoodsList.findOne({ id: ctx.request.body.id }).exec()
     const { present_price, id, image_path, name } = goods
@@ -305,9 +365,12 @@ router.post('/addShop', async (ctx, next) => {
       mallPrice: present_price,
       check: false,
       count: 1,
-      username: ctx.session.username
     }
-    await new ShopList(shop).save()
+    await userTest.findOneAndUpdate({ username }, {
+      $push: {
+        'shopList': shop
+      }
+    })
   }
   ctx.body = {
     status: 200,
@@ -317,10 +380,10 @@ router.post('/addShop', async (ctx, next) => {
 
 // 查询购物车
 router.get('/getCard', async (ctx, next) => {
-  const res = await ShopList.find({ username: ctx.session.username })
+  const res = await userTest.findOne({ username: ctx.session.username })
   ctx.body = {
     status: 200,
-    shopList: res || []
+    shopList: res.shopList || []
   }
 })
 
@@ -338,7 +401,7 @@ router.post('/editCart', async (ctx, next) => {
 router.post('/deleteShop', async (ctx, next) => {
   let id = ctx.request.body
   id.forEach(ids => {
-    ShopList.findOneAndDelete({ id: ids,username: ctx.session.username }).exec()
+    ShopList.findOneAndDelete({ id: ids, username: ctx.session.username }).exec()
     ctx.body = {
       status: 200,
       msg: '删除成功'

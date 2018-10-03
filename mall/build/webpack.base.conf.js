@@ -39,7 +39,8 @@ module.exports = {
       'pages': resolve('src/pages'),
       'css': resolve('src/assets/css'),
       'other': resolve('src/pages'),
-      'js': resolve('src/assets/js')
+      'js': resolve('src/assets/js'),
+      'img': resolve('src/assets/img'),
     }
   },
   module: {

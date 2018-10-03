@@ -18,7 +18,6 @@ const collectionSchema = new Schema({
     image_path:String,
     orl_price:Number,
     goods_serlal_number:String
-    
 },{
     collections:'Collection'
 })

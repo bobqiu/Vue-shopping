@@ -28,7 +28,7 @@ import {mapGetters,mapMutations,mapActions} from 'vuex'
 import axios from 'axios'
 export default {
     computed: {
-        ...mapGetters(['userName','addressInfo'])
+        ...mapGetters(['addressInfo'])
     },
 
     data() {
@@ -53,7 +53,6 @@ export default {
     methods: {
         async onSave(val) {
             const res = await axios.post('/api/address',{
-                username: this.userName,
                 name: val.name,
                 tel: val.tel,
                 address: val.province + val.city + val.county + val.addressDetail,

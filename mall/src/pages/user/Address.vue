@@ -15,10 +15,8 @@
                     暂无收货地址~~
                 </div>
             </Scroll>
-           
         <div class="add" @click="onAdd">新增地址</div>
         </div>
-
 </transition>  
 </template>
 
@@ -67,7 +65,9 @@ export default {
 
     async created() {
         const res = await axios.get('/api/getAddress')
-        this.list = res.data.address.reverse()
+        if (res.data.status == 200) {
+            this.list = res.data.address.reverse()
+        }
     },
     }
 </script>
@@ -79,11 +79,11 @@ export default {
         left 0
         right 0
         bottom 0px
-        z-index 200
+        z-index 500
         background #fff
         .scroll
             position fixed
-            top 40px
+            top 38px
             bottom 50px
             left 0
             right 0

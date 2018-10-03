@@ -9,6 +9,7 @@ import Login from 'pages/user/Login'
 import Address from 'pages/user/address'
 import AddressEdit from 'pages/user/AddressEdit'
 import Collection from 'pages/user/Collection'
+import ShoppingPayMent from 'pages/shoppingCart/components/ShoppingPayMent'
 
 import Browse from 'pages/browse/Browse'
 
@@ -19,7 +20,7 @@ export default new Router({
     { path: '/', redirect: '/home' },
     { path: '/home', name: 'Home', component: Home, children: [{ path: ':id', component: Details }] },
     { path: '/category', name: 'Category', component: Category, children: [{ path: ':id', component: Details }] },
-    { path: '/shoppingCart', name: 'ShoppingCart', component: ShoppingCart },
+    { path: '/shoppingCart', name: 'ShoppingCart', component: ShoppingCart,children: [{ path: '/shoppingCart/ShoppingPayMent', component: ShoppingPayMent }] },
     { path: '/user/login', name: 'Login', component: Login }, // 登入
     { path: '/user/address', name: 'Address', component: Address }, // 地址
     { path: '/user/addressEdit', name: 'AddressEdit', component: AddressEdit }, // 新增和编辑地址

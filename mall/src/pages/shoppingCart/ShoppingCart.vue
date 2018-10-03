@@ -10,7 +10,7 @@
                 <div class="right">
                     <p class="name">{{val.name}}</p>
                     <div>
-                        <p class="one"><span>￥</span>{{(val.mallPrice * val.count).toFixed(2)}}</p>
+                        <p class="one"><span>￥</span>{{(val.present_price * val.count).toFixed(2)}}</p>
                         <p class="two">
                             <i class="iconfont icon-jian" @click="editCart('minu',val)"></i>
                             <span>{{val.count}}</span>
@@ -26,13 +26,13 @@
                 </div>
                 <div class="total">
                     <p>合计：<span>￥{{totalPrice}}</span></p>
-                    <p v-if="totalPrice<59">满59元配送，还差{{(59-totalPrice).toFixed(2)}}元</p>
+                    <p style="line-height:1.3" v-if="totalPrice<59">满59元配送，还差{{(59-totalPrice).toFixed(2)}}元才能结算噢</p>
                     <p v-else>请确认订单</p>
                 </div>
             </div>
             <div class="confirm"  v-show="shopList.length">
                 <div class="notijiao delete" v-if="deleteFlag"  @click="deletes">删除</div>
-                <div class="notijiao" :class="checkList.length && totalPrice>=59?'delete':''">提交订单</div>
+                <div class="notijiao delete" v-if="deleteFlag && totalPrice>=59" @click="placeOrder">去结算</div>
             </div>
         </ul>
         <!-- <div class="shop-warpper"  v-show="!shopList.length">
@@ -49,7 +49,7 @@
                     <Panl/>
                 </div>
             </div> -->
-
+        <router-view />
     </div>
 </template>
 
@@ -59,7 +59,7 @@ import { Toast ,Dialog,Checkbox,SubmitBar} from "vant";
 Vue.use(SubmitBar).use(Checkbox).use(Dialog)
 import axios from "axios";
 import BaseTitle from "pages/other/BaseTitle";
-
+import {mapMutations} from 'vuex'
 export default {
   data() {
     return {
@@ -67,7 +67,6 @@ export default {
       checked: false,
       checkList: [],
       checkListId: [],
-      //   shop:require('static/img/shop.png'),
       floorName: "为你推荐",
       timer: null, //用于函数节流
       defaultImg: 'this.src="' + require("../../assets/img/vue.jpg") + '"',
@@ -81,7 +80,7 @@ export default {
         for(let i = 0; i < this.shopList.length; i++) {
             let item = this.shopList[i];
             if(item.check == true){
-                tatol += item.mallPrice * item.count
+                tatol += item.present_price * item.count
             }
         }
        return tatol.toFixed(2)
@@ -148,7 +147,7 @@ export default {
       const res = await axios.post("/api/editCart", {
           count: val.count,
           id: val.id,
-          mallPrice: (val.mallPrice * val.count).toFixed(2)
+          mallPrice: (val.present_price * val.count).toFixed(2)
         });
     },
     // 删除商品
@@ -182,7 +181,23 @@ export default {
       if (res.data.code == 1) {
         this.tablist(res.data.shopRecommend);
       }
-    }
+    },
+
+    // 提交订单
+    placeOrder() {
+        let id = []
+        this.$router.push({path: '/shoppingCart/ShoppingPayMent'})
+        this.shopList.forEach(item => {
+            if (item.check) {
+                id.push(item)
+            }
+        })
+        this.setShopList(id)
+    },
+
+    ...mapMutations({
+        setShopList: 'SHOPORDERLIST'
+    })
   },
   created() {
     this.getShopList();

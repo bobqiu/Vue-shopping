@@ -14,6 +14,9 @@ const matutaions = {
     },
     [types.BROWSE](state,browse) {
         state.browse = browse
+    },
+    [types.SHOPORDERLIST](state,shopOrderList) {
+        state.shopOrderList = shopOrderList
     }
 }
 

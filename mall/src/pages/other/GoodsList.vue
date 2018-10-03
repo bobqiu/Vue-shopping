@@ -1,12 +1,14 @@
 <template>
     <transition-group tag="ul" :name="lists">
-        <li v-for="item in list" :key="item._id" class="good-item border-bottom" @click="details(item)">
-            <img :src="item.image" :onerror="defaultImg" :class="{img2:isBrowse || isCollection}">
+        <li v-for="item in list" :key="item._id || item.id" class="good-item border-bottom" @click="details(item)">
+            <img :src="item.image || item.image_path" :onerror="defaultImg" :class="{img2:isBrowse || isCollection || isOrder}">
             <div>
                 <p class="p1">{{item.name}}</p>
                 <p class="p2">
-                    <span class="pic">￥{{item.present_price}}</span>
+                    <span class="pic" v-if="isOrder">￥{{item.present_price * item.count}}</span>
+                    <span class="pic" v-else>￥{{item.present_price}}</span>
                     <span class="orl-pic">{{item.orl_price}}</span>
+                    <span class="count" v-if="isOrder">x{{item.count}}</span>
                 </p>
                 <div class="icon" v-if="isBrowse || isCollection">
                     <van-icon name="close" class="close" @click.stop="close(item)"/>
@@ -35,7 +37,13 @@ export default {
         isCollection: {
             type: Boolean,
             default: false
+        },
+
+        isOrder: {
+            type: Boolean,
+            default: false
         }
+        
     },
 
     computed: {
@@ -101,6 +109,8 @@ ul
                 .orl-pic
                     text-decoration: line-through
                     font-size 13px
+                .count
+                    float right    
                 .pic
                     color #f00
                     font-weight 700
