@@ -1,47 +1,51 @@
 <template>
     <div class="card">
         <BaseTitle title="购物车"/>
-        <ul class="ul">
-            <li class="border-bottom" v-for="val of shopList" :key="val.id">
-                <div class="left">
-                    <input type="checkbox"  v-model="val.check" @change="itemChange(val)"/>
-                </div>
-                <div class="middle"><img :src="val.image_path" :onerror="defaultImg"></div>
-                <div class="right">
-                    <p class="name">{{val.name}}</p>
-                    <div>
-                        <p class="one"><span>￥</span>{{(val.present_price * val.count).toFixed(2)}}</p>
-                        <p class="two">
-                            <i class="iconfont icon-jian" @click="editCart('minu',val)"></i>
-                            <span>{{val.count}}</span>
-                            <i @click="editCart('add',val)" class="iconfont icon-jia"></i>
-                        </p>
+        <Scroll :data='shopList' class="scroll" ref="scroll" v-show="shopList && shopList.length">
+            <ul class="ul">
+                <div class="pics border-bottom" v-show="shopList.length">
+                    <div  class="quanxuan">
+                        <input id="select" type="checkbox" @change="change" v-model="allCheck"/>
+                        <label for="select" class="span">{{allCheck?'取消全选':'全选'}}</label>
+                    </div>
+                    <div class="total">
+                        <p>合计：<span>￥{{totalPrice}}</span></p>
+                        <p style="line-height:1.3" v-if="totalPrice<59">满59元配送，还差{{(59-totalPrice).toFixed(2)}}元才能结算噢</p>
+                        <p v-else>请确认订单</p>
                     </div>
                 </div>
-            </li>
-            <div class="pics border-bottom" v-show="shopList.length">
-                <div  class="quanxuan">
-                    <input id="select" type="checkbox" @change="change" v-model="allCheck"/>
-                    <label for="select" class="span">{{allCheck?'取消全选':'全选'}}</label>
+                <div class="confirm"  v-show="shopList.length">
+                    <div class="notijiao delete" v-if="deleteFlag"  @click="deletes">删除</div>
+                    <div class="notijiao delete" v-if="deleteFlag && totalPrice>=59" @click="placeOrder">去结算</div>
                 </div>
-                <div class="total">
-                    <p>合计：<span>￥{{totalPrice}}</span></p>
-                    <p style="line-height:1.3" v-if="totalPrice<59">满59元配送，还差{{(59-totalPrice).toFixed(2)}}元才能结算噢</p>
-                    <p v-else>请确认订单</p>
-                </div>
+                <li class="border-bottom" v-for="val of shopList" :key="val.id">
+                    <div class="left">
+                        <input type="checkbox"  v-model="val.check" @change="itemChange(val)"/>
+                    </div>
+                    <div class="middle"><img :src="val.image_path" :onerror="defaultImg"></div>
+                    <div class="right">
+                        <p class="name">{{val.name}}</p>
+                        <div>
+                            <p class="one"><span>￥</span>{{(val.present_price * val.count).toFixed(2)}}</p>
+                            <p class="two">
+                                <i class="iconfont icon-jian" @click="editCart('minu',val)"></i>
+                                <span>{{val.count}}</span>
+                                <i @click="editCart('add',val)" class="iconfont icon-jia"></i>
+                            </p>
+                        </div>
+                    </div>
+                </li>
+
+            </ul>
+         </Scroll>
+        <div class="shop-warpper"  v-show="!shopList.length">
+            <div class="shop">
+              <img :src="noShop" alt="">
             </div>
-            <div class="confirm"  v-show="shopList.length">
-                <div class="notijiao delete" v-if="deleteFlag"  @click="deletes">删除</div>
-                <div class="notijiao delete" v-if="deleteFlag && totalPrice>=59" @click="placeOrder">去结算</div>
-            </div>
-        </ul>
-        <!-- <div class="shop-warpper"  v-show="!shopList.length">
-          <div class="shop">
-              <img :src="shop" alt="">
-              </div>
-              <p class="desc">您的购物还是空空的哦</p>
-              <p class="desc2" @click='goshop'>去购物</p>
-        </div> -->
+            <p class="desc">{{!userName?'请先登录噢~~':'您的购物还是空空的哦'}}</p>
+            <p class="desc2" @click='goshop' v-if="userName">去购物</p>
+            <p class="desc2" @click='goLogin' v-else>去登录</p>
+        </div>
             <!-- 为你推荐 -->
             <!-- <div :style="!shopList.length?'margin-top:40px':''">
                 <Title :floorName='floorName'/>
@@ -58,8 +62,9 @@ import Vue from "vue";
 import { Toast ,Dialog,Checkbox,SubmitBar} from "vant";
 Vue.use(SubmitBar).use(Checkbox).use(Dialog)
 import axios from "axios";
+import Scroll from 'pages/other/Scroll'
 import BaseTitle from "pages/other/BaseTitle";
-import {mapMutations} from 'vuex'
+import {mapMutations,mapGetters} from 'vuex'
 export default {
   data() {
     return {
@@ -72,6 +77,8 @@ export default {
       defaultImg: 'this.src="' + require("../../assets/img/vue.jpg") + '"',
       allCheck: false,
       deleteFlag: false,
+      noShop: require('img/shop.png'),
+      isLogin: false
     };
   },
   computed: {
@@ -84,10 +91,13 @@ export default {
             }
         }
        return tatol.toFixed(2)
-    }
+    },
+
+    ...mapGetters(['userName'])
   },
   components: {
-    BaseTitle
+    BaseTitle,
+    Scroll,
   },
   methods: {
     //全选
@@ -96,6 +106,9 @@ export default {
             v.check = this.allCheck
             if (v.check) {
                 this.deleteFlag = true
+            //    this.$refs.scroll.$el.style.bottom = '100px'
+            //    transform:translate3d(0,0,30px)
+                
             } else {
                 this.deleteFlag = false
             }
@@ -108,8 +121,6 @@ export default {
             return v.check == true
         })
         select.length == this.shopList.length ? this.allCheck = true : this.allCheck = false
-
-
         for (let i = 0; i < this.shopList.length; i++) {
             if (this.shopList[i].check) {
                 this.deleteFlag = true
@@ -124,14 +135,14 @@ export default {
     async getShopList() {
       const res = await axios.get("/api/getCard");
       if (res.data.status == -1) {
-        //   this.$router.push({path:'/user/login'})
+        this.isLogin = true
       } else {
         this.shopList = res.data.shopList;
       }
     },
 
     goshop() {
-      this.$router.push({ path: "/" });
+      this.$router.push({ path: "/home" });
     },
     // 加减商品
     async editCart(flag, val) {
@@ -165,6 +176,7 @@ export default {
                     message: `确认删除商品吗?`
                 }).then(() => {
                      this.deleteShop(id)
+                     this.deleteFlag = false
                 })
             }
         })
@@ -201,7 +213,12 @@ export default {
 
     ...mapMutations({
         setShopList: 'SHOPORDERLIST'
-    })
+    }),
+
+    goLogin() {
+        console.log(1234);
+        this.$router.push({path:'/user/login'})
+    }
   },
   created() {
     this.getShopList();
@@ -222,9 +239,20 @@ export default {
 }
 
 .card {
+    position fixed
+    top 0px
+    left 0
+    right 0
+    bottom 0px
+    .scroll {
+        position fixed
+        top 38px
+        bottom 50px
+        left 0
+        right 0
+        overflow hidden
     .ul {
         margin: 0 10px;
-
         li {
             display: flex;
             align-items: center;
@@ -236,7 +264,6 @@ export default {
                 width: 40px;
                 flex: 0 0 40px;
             }
-
             .middle {
                 width: 80px;
                 flex: 0 0 80px;
@@ -365,7 +392,7 @@ export default {
             }
         }
     }
-
+}
     .shop-warpper {
         width: 100%;
         padding-top: 20px;

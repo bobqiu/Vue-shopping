@@ -8,6 +8,7 @@ const Collection = require('../mongodb/schema/collection')
 const ShopList = require('../mongodb/schema/shopList')
 const userTest = require('../mongodb/schema/user2')
 const md5 = require("md5")
+require('../public/js/utils')
 // 首页
 router.get('/recommend', async (ctx, next) => {
   const res = await Goods.find({})
@@ -89,7 +90,7 @@ router.post('/login', async (ctx, next) => {
   const { username, password } = ctx.request.body
   let data = await userTest.findOne({ username }) //拿到用户名查询数据库
   console.log(data);
-  
+
   if (!data || !data.username) {  //说明数据库没有这个名字
     ctx.body = {
       code: -1,
@@ -322,12 +323,12 @@ router.post('/addShop', async (ctx, next) => {
   const username = ctx.session.username
   // 单价 id image_path 商品名字
   // 先查数据库有没有这条商品,有就数量加1,没有就新创建一条
-  const test = await userTest.aggregate([{"$unwind": "$shopList" },
-  { "$match": { "shopList.id": ctx.request.body.id,username } },
+  const test = await userTest.aggregate([{ "$unwind": "$shopList" },
+  { "$match": { "shopList.id": ctx.request.body.id, username } },
   { "$project": { "shopList": 1 } }])
   let newData = test.length && test[0].shopList
   console.log(newData);
-  
+
   if (newData) {
     await userTest.findOneAndUpdate({ username, 'shopList.id': ctx.request.body.id }, {
       $set: {
@@ -336,8 +337,6 @@ router.post('/addShop', async (ctx, next) => {
     })
   } else {  // 说明没有这条数据
     // 查到这条商品数据
-  console.log(1111111111);
-    
     let goods = await GoodsList.findOne({ id: ctx.request.body.id }).exec()
     const { present_price, id, image_path, name } = goods
     let shop = {
@@ -374,7 +373,7 @@ router.get('/getCard', async (ctx, next) => {
   const res = await userTest.findOne({ username })
   ctx.body = {
     status: 200,
-    shopList: res.shopList || []
+    shopList: res && res.shopList || []
   }
 })
 
@@ -382,17 +381,7 @@ router.get('/getCard', async (ctx, next) => {
 router.post('/editCart', async (ctx, next) => {
   const { count, id, mallPrice } = ctx.request.body
   const username = ctx.session.username
-  // await ShopList.findOneAndUpdate({ username, id }, { id, count, mallPrice })
-  // ctx.body = {
-  //   status: 200,
-  //   msg: '修改成功'
-  // }
-  // await userTest.findOneAndUpdate({ username, 'addressList.id': data.id }, {
-  //   $set: {
-  //     'addressList.$': data
-  //   }
-  // })
-  await userTest.findOneAndUpdate({ username, 'shopList.id':id }, {
+  await userTest.findOneAndUpdate({ username, 'shopList.id': id }, {
     $set: {
       'shopList.$.count': count,
       'shopList.$.mallPrice': mallPrice,
@@ -404,17 +393,57 @@ router.post('/editCart', async (ctx, next) => {
   }
 })
 
-
 // 购物车的删除
 router.post('/deleteShop', async (ctx, next) => {
   let id = ctx.request.body
   id.forEach(ids => {
-    ShopList.findOneAndDelete({ id: ids, username: ctx.session.username }).exec()
-    ctx.body = {
-      status: 200,
-      msg: '删除成功'
-    }
+    userTest.findOneAndUpdate({ username: ctx.session.username, 'shopList.id': ids }, {
+      $pull: {
+        'shopList': {
+          'id': ids
+        }
+      }
+    }).exec()
   })
+  ctx.body = {
+    status: 200,
+    msg: '删除成功'
+  }
 })
 
+// 接受订单
+router.post('/order', async (ctx, next) => {
+  // 订单信息
+  let platform = '622';           // 订单头
+  let r1 = Math.floor(Math.random() * 10);
+  let r2 = Math.floor(Math.random() * 10);
+  let sysDate = new Date().Format('yyyyMMddhhmmss');  // 体统时间
+  let createDate = new Date().Format('yyyy-MM-dd hh:mm:ss');  // 订单创建时间
+  let orderId = platform + r1 + sysDate + r2;   // 订单id
+
+  const data = ctx.request.body
+  const username = ctx.session.username
+  let newData = []
+  const order = await userTest.findOne({username})
+  // 根据id查询出购物车订单
+  for (let i = 0; i < data.orderId.length; i++) {
+    let item = await userTest.aggregate([{ "$unwind": "$shopList" },
+    { "$match": { "shopList.id": data.orderId[i], username } },
+    { "$project": { "shopList": 1 } }])
+    newData[i] = item[0].shopList 
+    if (order.order && !order.order[orderId]) {  // 判断有没有这条订单id，如果没有就把这条订单做key
+      console.log(order.order['id']);
+      
+      order.order[orderId] = order.order['id'];
+      delete order.order['id'];
+      order.order[orderId] = newData
+      // await userTest.findOneAndUpdate({ username, 'order.orderId': orderId }, {
+      //   $set: {
+      //     'order.$.orderId': newData
+      //   }
+      // })
+    }
+  }
+  ctx.body = newData
+})
 module.exports = router

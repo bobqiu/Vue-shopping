@@ -3,23 +3,24 @@
 <transition name='bounce'>
     <div class="order">
         <BaseTitle :back='back' title="订单结算" @goBack='goBack'/>
-        <div>
-            <div class="address-warp">
-                <div class="address">
-                    <div class="icon"><van-icon name="location" class="location"/></div>
-                    <div class="address-cont">
-                        <p class="name">收货人: 小白白 <span>18685459561</span></p>
-                        <p class="address-e">收货地址: 时刻让对方感觉可能都好几个迪瑞克斯很感激你看电视剧都是几点回来开会决定离开</p>
-                        <p class="no">(收货不便时,可选择免费待收货服务)</p>
+                <div class="address-warp">
+                    <div class="address">
+                        <div class="icon"><van-icon name="location" class="location"/></div>
+                        <div class="address-cont">
+                            <p class="name">收货人: 小白白 <span>18685459561</span></p>
+                            <p class="address-e">收货地址: 时刻让对方感觉可能都好几个迪瑞克斯很感激你看电视剧都是几点回来开会决定离开</p>
+                            <p class="no">(收货不便时,可选择免费待收货服务)</p>
+                        </div>
+                        <div class="icon2"><van-icon name="arrow" class="location"/></div>
                     </div>
-                    <div class="icon2"><van-icon name="arrow" class="location"/></div>
-                </div>
-                <img :src="caitiao" width="100%" height="3px" alt="" class="caitiao">
+                    <img :src="caitiao" width="100%" height="3px" alt="" class="caitiao">
+                <Scroll :data='shopOrderList' ref="scroll" class="scroll">
+                    <div class="goods-list">
+                        <GoodsList :list='shopOrderList' :isOrder='isOrder'/>
+                    </div>
+                </Scroll>
             </div>
-            <div class="goods-list">
-                <GoodsList :list='shopOrderList' :isOrder='isOrder'/>
-            </div>
-        </div>
+        
         <div v-if="shopOrderList && shopOrderList.length">
             <van-submit-bar
                 :price="price"
@@ -37,12 +38,15 @@ import GoodsList from 'pages/other/GoodsList'
 import BaseTitle from 'pages/other/BaseTitle'
 import {mapGetters,mapMutations} from 'vuex'
 import { Icon ,SubmitBar } from 'vant';
+import Scroll from 'pages/other/Scroll'
 import Vue from 'vue'
+import axios from 'axios'
 Vue.use(Icon).use(SubmitBar)
 export default {
     components: {
         BaseTitle,
         GoodsList,
+        Scroll,
     },
 
     computed: {
@@ -56,8 +60,6 @@ export default {
                 })
                 return Number( num.toFixed(2) * 100)
             }
-             
-
         }
     },
 
@@ -77,11 +79,17 @@ export default {
             }, 300);
         },
 
-        onSubmit() {
+        async onSubmit() {
             // 传地址id，订单id，和总价格
-            let id;
+            let Addressid = 123456745;
+            let orderId = []
             this.shopOrderList.forEach( item => {
-                console.log(item.id);
+                orderId.push(item.id)
+            })
+            axios.post('/api/order',{
+                Addressid,
+                orderId,
+                totalPrice: (this.price / 100).toFixed(2)
             })
         },
 
@@ -100,7 +108,14 @@ export default {
     right 0
     bottom 0px
     z-index 500
-    background #FAFAFA
+    background #fff
+    .scroll
+        position fixed
+        top 148px
+        bottom 50px
+        left 0
+        right 0
+        overflow hidden
     .address-warp
         .caitiao
             margin-top -10px

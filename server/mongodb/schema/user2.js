@@ -4,15 +4,15 @@ const db = require('../init.js');
 const ObjectId = Schema.Types.ObjectId
 const userSchema = new Schema({ 
     username:{
-        type:String,    //字段类型为String类型
-        unique:true,    //设置这个字段是唯一的，不重复
-        required:true,   //生成这个字段的时候是必须的
-        max:16,        //设置最大为16
-        min:2,          //设置最小为0
+        type:String,        //字段类型为String类型
+        unique:true,        //设置这个字段是唯一的，不重复
+        required:true,      //生成这个字段的时候是必须的
+        max:16,             //设置最大为16
+        min:2,              //设置最小为0
     },
     password:{
         type:String,    //字段类型为String类型
-        max:16,        //设置最大为100
+        max:16,         //设置最大为100
         min:6,          //设置最小为0
         required:true   //生成这个字段的时候是必须的
     },
@@ -30,9 +30,10 @@ const userSchema = new Schema({
         areaCode: String            // 城市编码
     }],
     // 用户收藏
-    collections: [],
-    shopList: [],   // 购物车车
+    collections: [],    // 用户收藏
+    shopList: [],       // 购物车车
+    order: {},           // 用户的订单
 })
-
+ 
 // 发布模型
 module.exports = db.model('User2',userSchema);

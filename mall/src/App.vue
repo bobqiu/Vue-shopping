@@ -3,7 +3,7 @@
     <!-- <keep-alive> -->
       <router-view/>
     <!-- </keep-alive> -->
-    <div class="tab">
+    <div class="tab" v-show="payMent">
       <van-tabbar v-model="active" @change='change'>
         <van-tabbar-item  icon="wap-home" >商城</van-tabbar-item>
         <van-tabbar-item icon="wap-nav">分类</van-tabbar-item>
@@ -21,7 +21,8 @@ export default {
   name: 'App',
   data() {
     return {
-      active: 0
+      active: 0,
+      payMent: true
     }
   },
   methods: {
@@ -45,6 +46,7 @@ export default {
 
   created() {
     const name = this.$router.history.current.name
+    const fullPath = this.$router.history.current.fullPath
     if (name === 'Category') {
       this.active = 1
     } else if (name === 'ShoppingCart') {
@@ -55,12 +57,32 @@ export default {
       this.active = 0
     }
 
+    if (fullPath === '/user/address' || fullPath === '/user/addressEdit' || fullPath === '/user/collection' || fullPath === '/my/browse') {
+      this.active = 3
+    }else if(fullPath=== '/shoppingCart/ShoppingPayMent') {
+        this.payMent = false
+    } 
+    
     axios.post('/api/keeplogin').then( res => {
       if (res.data.status == 1) {
         this.setName(res.data.username)
       } 
     })
   },
+  watch: {
+    $route(to,from){
+      if (to.path === '/home' || to.path == '/') {
+        this.active = 0
+      }
+      if(to.path === '/shoppingCart/ShoppingPayMent') {
+        this.payMent = false
+      } else {
+        setTimeout(() => {
+          this.payMent = true
+        }, 300);
+      }
+    }
+  }
 }
 </script>
 <style lang='less'>
