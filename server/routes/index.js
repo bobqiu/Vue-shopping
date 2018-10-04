@@ -60,30 +60,6 @@ router.get('/goods/one', async (ctx, next) => {
   }
 })
 
-// 注册
-// router.post('/register', async (ctx, next) => {
-//   const { username, password } = ctx.request.body
-//   let data = await User.findOne({ username })
-//   if (!data) {
-//     await new User({
-//       username,
-//       password: md5(password)
-//     }).save()
-//     ctx.body = {
-//       code: 200,
-//       msg: '注册成功'
-//     }
-//     ctx.session['login'] = 1
-//     ctx.session['username'] = username
-//   } else {
-//     if (data.username === username) {
-//       ctx.body = {
-//         code: -1,
-//         msg: '用户名已存在'
-//       }
-//     }
-//   }
-// })
 router.post('/register', async (ctx, next) => {
   const { username, password } = ctx.request.body
   let data = await userTest.findOne({ username })
@@ -112,7 +88,9 @@ router.post('/register', async (ctx, next) => {
 router.post('/login', async (ctx, next) => {
   const { username, password } = ctx.request.body
   let data = await userTest.findOne({ username }) //拿到用户名查询数据库
-  if (!data.username) {  //说明数据库没有这个名字
+  console.log(data);
+  
+  if (!data || !data.username) {  //说明数据库没有这个名字
     ctx.body = {
       code: -1,
       msg: '用户名不存在',
@@ -251,13 +229,14 @@ router.post('/isCollection', async (ctx, next) => {
       isCollection = 0  // 未收藏
     } else {
       if (result.collections.length) {
-        result.collections.forEach(item => {
-          if (item.id === res.id) {
+        for (let i = 0; i < result.collections.length; i++) {
+          if (result.collections[i].id === res.id) {
             isCollection = 1
+            break
           } else {
             isCollection = 0
           }
-        })
+        }
       } else {
         isCollection = 0
       }
@@ -343,10 +322,12 @@ router.post('/addShop', async (ctx, next) => {
   const username = ctx.session.username
   // 单价 id image_path 商品名字
   // 先查数据库有没有这条商品,有就数量加1,没有就新创建一条
-  const test = await userTest.aggregate([{ "$unwind": "$shopList" },
-  { "$match": { "shopList.id": ctx.request.body.id } },
+  const test = await userTest.aggregate([{"$unwind": "$shopList" },
+  { "$match": { "shopList.id": ctx.request.body.id,username } },
   { "$project": { "shopList": 1 } }])
   let newData = test.length && test[0].shopList
+  console.log(newData);
+  
   if (newData) {
     await userTest.findOneAndUpdate({ username, 'shopList.id': ctx.request.body.id }, {
       $set: {
@@ -355,6 +336,8 @@ router.post('/addShop', async (ctx, next) => {
     })
   } else {  // 说明没有这条数据
     // 查到这条商品数据
+  console.log(1111111111);
+    
     let goods = await GoodsList.findOne({ id: ctx.request.body.id }).exec()
     const { present_price, id, image_path, name } = goods
     let shop = {
@@ -380,7 +363,15 @@ router.post('/addShop', async (ctx, next) => {
 
 // 查询购物车
 router.get('/getCard', async (ctx, next) => {
-  const res = await userTest.findOne({ username: ctx.session.username })
+  const username = ctx.session.username
+  if (!username) {
+    ctx.body = {
+      status: -1,
+      msg: '请登录'
+    }
+    return
+  }
+  const res = await userTest.findOne({ username })
   ctx.body = {
     status: 200,
     shopList: res.shopList || []
@@ -390,12 +381,29 @@ router.get('/getCard', async (ctx, next) => {
 // 购物车增加和减少
 router.post('/editCart', async (ctx, next) => {
   const { count, id, mallPrice } = ctx.request.body
-  await ShopList.findOneAndUpdate({ username: ctx.session.username, id }, { id, count, mallPrice })
+  const username = ctx.session.username
+  // await ShopList.findOneAndUpdate({ username, id }, { id, count, mallPrice })
+  // ctx.body = {
+  //   status: 200,
+  //   msg: '修改成功'
+  // }
+  // await userTest.findOneAndUpdate({ username, 'addressList.id': data.id }, {
+  //   $set: {
+  //     'addressList.$': data
+  //   }
+  // })
+  await userTest.findOneAndUpdate({ username, 'shopList.id':id }, {
+    $set: {
+      'shopList.$.count': count,
+      'shopList.$.mallPrice': mallPrice,
+    }
+  })
   ctx.body = {
     status: 200,
     msg: '修改成功'
   }
 })
+
 
 // 购物车的删除
 router.post('/deleteShop', async (ctx, next) => {

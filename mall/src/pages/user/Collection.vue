@@ -8,7 +8,7 @@
                 <GoodsList :list='list' :isCollection='isCollection' @datails='datails' @close='close'/>
             </div>
             <div v-if="!list.length" class="null">
-                暂无收藏~~
+                 {{!isText? '暂无收藏~~' : '请先登录噢~~'}}
             </div>
         </Scroll>
         <router-view/>
@@ -34,7 +34,8 @@ export default {
         return {
             back: true,
             isCollection: true,
-            list: []
+            list: [],
+            isText: false
         }
     },
 
@@ -48,9 +49,11 @@ export default {
         },
 
         getCollection() {
-            axios.get('/api//collection/list').then( res => {
+            axios.get('/api/collection/list').then( res => {
                 if (res.data.status == 200) {
                     this.list = res.data.collection
+                } else {
+                    this.isText = true
                 }
             })
         },

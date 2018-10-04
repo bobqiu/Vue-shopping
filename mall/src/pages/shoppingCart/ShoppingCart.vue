@@ -123,7 +123,11 @@ export default {
 
     async getShopList() {
       const res = await axios.get("/api/getCard");
-      this.shopList = res.data.shopList;
+      if (res.data.status == -1) {
+        //   this.$router.push({path:'/user/login'})
+      } else {
+        this.shopList = res.data.shopList;
+      }
     },
 
     goshop() {
