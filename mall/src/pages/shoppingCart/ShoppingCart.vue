@@ -74,7 +74,7 @@ export default {
       checkListId: [],
       floorName: "为你推荐",
       timer: null, //用于函数节流
-      defaultImg: 'this.src="' + require("../../assets/img/vue.jpg") + '"',
+      defaultImg: 'this.src="' + require("img/vue.jpg") + '"',
       allCheck: false,
       deleteFlag: false,
       noShop: require('img/shop.png'),
@@ -106,9 +106,6 @@ export default {
             v.check = this.allCheck
             if (v.check) {
                 this.deleteFlag = true
-            //    this.$refs.scroll.$el.style.bottom = '100px'
-            //    transform:translate3d(0,0,30px)
-                
             } else {
                 this.deleteFlag = false
             }
@@ -152,8 +149,8 @@ export default {
         }
         val.count--;
       } else if (flag == "add") {
-        if (val.count >= 15) {
-          Toast("最多购买15件噢~~");
+        if (val.count >= 50) {
+          Toast("最多购买50件噢~~");
           return;
         }
         val.count++

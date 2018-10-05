@@ -29,8 +29,8 @@ export default {
 
         // 增加数量
         plus() {
-            if (this.count >= 15) {
-                Toast('最多选择15件噢~~')
+            if (this.count >= 50) {
+                Toast('最多选择50件噢~~')
                 return
             }
             this.count++

@@ -71,6 +71,8 @@ export default {
   },
   watch: {
     $route(to,from){
+      console.log(to.path);
+      console.log(from.path);
       if (to.path === '/home' || to.path == '/') {
         this.active = 0
       }

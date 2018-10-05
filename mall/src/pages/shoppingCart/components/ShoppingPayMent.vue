@@ -37,7 +37,7 @@
 import GoodsList from 'pages/other/GoodsList'
 import BaseTitle from 'pages/other/BaseTitle'
 import {mapGetters,mapMutations} from 'vuex'
-import { Icon ,SubmitBar } from 'vant';
+import { Icon ,SubmitBar,Toast } from 'vant';
 import Scroll from 'pages/other/Scroll'
 import Vue from 'vue'
 import axios from 'axios'
@@ -86,11 +86,18 @@ export default {
             this.shopOrderList.forEach( item => {
                 orderId.push(item.id)
             })
-            axios.post('/api/order',{
+            const res = await axios.post('/api/order',{
                 Addressid,
                 orderId,
                 totalPrice: (this.price / 100).toFixed(2)
             })
+            if (res.data.status == 200) {
+                Toast(`结算成功,一共${(this.price / 100).toFixed(2)}元`)
+                setTimeout(() => {
+                    this.setShopList([])
+                    this.$router.push({path: '/'})
+                }, 1000);
+            }
         },
 
         ...mapMutations({

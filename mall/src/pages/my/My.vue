@@ -11,7 +11,7 @@
       <p class="usename">欢迎您：{{userName}}</p>
       <p @click="loginOut">退出登录</p>
     </div>
-    <van-row class="user-links">
+    <!-- <van-row class="user-links">
       <van-col span="6">
         <van-icon name="pending-payment" />
         待付款
@@ -28,10 +28,10 @@
         <van-icon name="logistics" />
         待发货
       </van-col>
-    </van-row>
+    </van-row> -->
 
     <van-cell-group class="user-group">
-      <van-cell icon="records" title="全部订单" is-link />
+      <van-cell icon="records" title="全部订单" is-link @click="myOrder"/>
     </van-cell-group>
 
     <van-cell-group>
@@ -96,6 +96,10 @@ export default {
     // 最近浏览
     browse() {
       this.$router.push({path: '/my/browse'})
+    },
+
+    myOrder() {
+       this.$router.push({path: '/my/order'})
     }
   }
 };

@@ -1,11 +1,11 @@
 <template>
-    <transition-group tag="ul" :name="lists">
+        <ul>
         <li v-for="item in list" :key="item._id || item.id" class="good-item border-bottom" @click="details(item)">
             <img :src="item.image || item.image_path" :onerror="defaultImg" :class="{img2:isBrowse || isCollection || isOrder}">
             <div>
                 <p class="p1">{{item.name}}</p>
                 <p class="p2">
-                    <span class="pic" v-if="isOrder">￥{{item.present_price * item.count}}</span>
+                    <span class="pic" v-if="isOrder">￥{{(item.present_price * item.count).toFixed(2)}}</span>
                     <span class="pic" v-else>￥{{item.present_price}}</span>
                     <span class="orl-pic">{{item.orl_price}}</span>
                     <span class="count" v-if="isOrder">x{{item.count}}</span>
@@ -15,7 +15,7 @@
                 </div>
             </div>
         </li>
-    </transition-group>
+        </ul>
 </template>
 
 <script>
@@ -54,7 +54,7 @@ export default {
 
     data() {
         return {
-             defaultImg: 'this.src="' + require('../../assets/img/vue.jpg') + '"',
+             defaultImg: 'this.src="' + require('img/vue.jpg') + '"',
         }
     },
 
@@ -87,6 +87,7 @@ ul
             flex 0 0 30%
             width 30%
             height 90%
+            border 1px solid #eee
         .img2
             flex 0 0 25%
             width 25%

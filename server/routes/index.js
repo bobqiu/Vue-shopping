@@ -414,36 +414,62 @@ router.post('/deleteShop', async (ctx, next) => {
 // 接受订单
 router.post('/order', async (ctx, next) => {
   // 订单信息
-  let platform = '622';           // 订单头
-  let r1 = Math.floor(Math.random() * 10);
-  let r2 = Math.floor(Math.random() * 10);
-  let sysDate = new Date().Format('yyyyMMddhhmmss');  // 体统时间
-  let createDate = new Date().Format('yyyy-MM-dd hh:mm:ss');  // 订单创建时间
+  let platform = '622'           // 订单头
+  let r1 = Math.floor(Math.random() * 10)
+  let r2 = Math.floor(Math.random() * 10)
+  let sysDate = new Date().Format('yyyyMMddhhmmss')           // 体统时间
+  let createDate = new Date().Format('yyyy-MM-dd hh:mm:ss')   // 订单创建时间
   let orderId = platform + r1 + sysDate + r2;   // 订单id
-
   const data = ctx.request.body
   const username = ctx.session.username
   let newData = []
-  const order = await userTest.findOne({username})
+  const order = await userTest.findOne({ username })
+  if (!order.order) {
+    order.order = {}
+  }
   // 根据id查询出购物车订单
   for (let i = 0; i < data.orderId.length; i++) {
     let item = await userTest.aggregate([{ "$unwind": "$shopList" },
     { "$match": { "shopList.id": data.orderId[i], username } },
     { "$project": { "shopList": 1 } }])
-    newData[i] = item[0].shopList 
-    if (order.order && !order.order[orderId]) {  // 判断有没有这条订单id，如果没有就把这条订单做key
-      console.log(order.order['id']);
-      
-      order.order[orderId] = order.order['id'];
-      delete order.order['id'];
-      order.order[orderId] = newData
-      // await userTest.findOneAndUpdate({ username, 'order.orderId': orderId }, {
-      //   $set: {
-      //     'order.$.orderId': newData
-      //   }
-      // })
+    newData[i] = item[0].shopList
+    newData[i].order_id = orderId + i
+  }
+  if (!order.order[orderId]) {
+    order.order[orderId] = {
+      orderList: newData,
+      totalPrice: data.totalPrice,
+      createDate,
+      orderId
     }
   }
-  ctx.body = newData
+  await userTest.update({ username }, {
+    $set: {
+      'order': order.order,
+    }
+  })
+
+  for (let i = 0; i < data.orderId.length; i++) {
+    await userTest.findOneAndUpdate({ username, 'shopList.id': data.orderId[i] }, {
+      $pull: {
+        'shopList': {
+          'id': data.orderId[i]
+        }
+      }
+    })
+  }
+  ctx.body = {
+    status: 200,
+    msg: '结算成功!'
+  }
+})
+
+// 查询用户完成订单
+router.get('/myOrder', async (ctx, next) => {
+  const res = await userTest.findOne({ username: ctx.session.username })
+  ctx.body = {
+    status: 200,
+    list: res.order
+  }
 })
 module.exports = router

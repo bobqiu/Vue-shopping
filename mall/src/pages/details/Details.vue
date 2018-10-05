@@ -13,7 +13,7 @@
     <van-cell-group>
       <van-cell>
         <div class="goods-title">{{ goods.name }}</div>
-        <div class="goods-price">{{ goods.present_price }}</div>
+        <div class="goods-price">￥{{ goods.present_price }}</div>
       </van-cell>
       <van-cell class="goods-express">
         <van-col span="9">运费：{{ goods.express || 0}}</van-col>
@@ -93,14 +93,14 @@
             <p class="goods-name">{{goods.name}}</p>
             <p class="pic">
               <span>￥</span>
-              <span>{{goods.present_price}}</span>
+              <span>{{goods.present_price * newCount}}</span>
             </p>
           </div>
         </div>
         <div class="goods-bottom border-bottom">
             <div class="left">
               <p class="num">购买数量：</p>
-              <p class="totle">剩余 {{goods.amount}} 件 <span>每人限购15件</span></p>
+              <p class="totle">剩余 {{goods.amount}} 件 <span>每人限购50件</span></p>
             </div>
             <AdditionAndSubtraction @count='count'/>
         </div>
@@ -153,7 +153,7 @@ export default {
   data() {
     return {
       goods: { },
-      defaultImg: 'this.src="' + require('../../assets/img/vue.jpg') + '"',
+      defaultImg: 'this.src="' + require('img/vue.jpg') + '"',
       active: 0,
       item: [{id:0,title:'商品详情'},{id:1,title:'商品评论'}],
       isCollectionFlag: false,
@@ -172,7 +172,7 @@ export default {
     },
 
     onClickCart() {
-      this.$router.push('cart');
+      this.$router.push('/shoppingCart');
     },
 
     // 请求商品详情

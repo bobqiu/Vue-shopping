@@ -32,7 +32,9 @@ const userSchema = new Schema({
     // 用户收藏
     collections: [],    // 用户收藏
     shopList: [],       // 购物车车
-    order: {},           // 用户的订单
+    order:{
+        type: Object
+    },           // 用户的订单
 })
  
 // 发布模型

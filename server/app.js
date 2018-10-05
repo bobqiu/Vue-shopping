@@ -7,7 +7,6 @@ const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 
 const index = require('./routes/index')
-const users = require('./routes/users')
 const session = require('koa-session');
 // error handler
 onerror(app)
@@ -34,17 +33,21 @@ app.use(views(__dirname + '/views', {
   extension: 'pug'
 }))
 
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+app.use(async (ctx,next) => {
+  if (ctx.session.login != 1) { // 没有登录
+    if (ctx.url === '/register' || ctx.url === '/recommend' || ctx.url.includes('/classification') || ctx.url.includes('/goods/one') || ctx.url === '/login') {
+      await next()
+      return
+    }
+    ctx.body = {
+      msg: '请登录'
+    }
+  } else {
+    await next()
+  }
 })
-
 // routes
 app.use(index.routes(), index.allowedMethods())
-app.use(users.routes(), users.allowedMethods())
 
 // error-handling
 app.on('error', (err, ctx) => {
