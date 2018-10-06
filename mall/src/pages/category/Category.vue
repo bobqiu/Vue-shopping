@@ -1,7 +1,7 @@
 <template>
     <div>
         <BaseTitle title='商品分类'/>
-        <div class="content">
+        <div class="content" >
            <div class="left" ref="left">
                 <ul>
                     <li v-for='(val,index) in category' :key='val.mallCategoryId'  :class="{active:leftTabIndex==index}" @click="item(val,index)">
@@ -11,8 +11,8 @@
             </div>
             <div class="right" ref='right'>
                 <div class="empty">
-                        <van-tabs v-model="active" @click="onClick" swipeable @change='change'>
-                                <Scroll :data='dataList' class="scroll" ref="scroll" :bounce='bounce' >
+                        <van-tabs v-model="active" @click="onClick" >
+                                <Scroll  v-show="!showFlag" :data='dataList' class="scroll" ref="scroll" :bounce='bounce' >
                                     <div>
                                         <van-tab v-for="val in list || category[0].bxMallSubDto" :title="val.mallSubName" :key="val.mallSubId">
                                             <GoodsList :list='dataList' @datails='datails'/>
@@ -21,13 +21,13 @@
                                 </Scroll>
                             
                             </van-tabs>
-                        <div class="null" v-show="!dataList.length">
+                        <div class="null" v-show="!dataList.length && !showFlag">
                             暂无数据~~
                         </div>
-                   
                 </div>
             </div> 
         </div>
+        <BaseLoding :showFlag='showFlag'/>
         <router-view />
     </div>
 </template>
@@ -40,7 +40,9 @@ import Scroll from 'pages/other/Scroll'
 import GoodsList from 'pages/other/GoodsList'
 Vue.use(Tab).use(Tabs)
 import BaseTitle from 'pages/other/BaseTitle'
+import {loading} from 'js/mixin'
 export default {
+    mixins: [loading],
     computed: {
         ...mapGetters(['category'])
     },
@@ -77,6 +79,7 @@ export default {
         },
 
         onClick(index) {
+            this.dataList = []
             const mallSubId = this.category[this.leftTabIndex].bxMallSubDto[index].mallSubId
             this.getList(mallSubId)
         },
@@ -86,8 +89,10 @@ export default {
         },
 
         getList(id) {
+            this.showFlag = true
             axios.get(`/api/classification?mallSubId=${id}`).then(res => {
                 if (res.data.code == 200) {
+                    this.showFlag = false
                     this.dataList =  res.data.dataList
                 }
             })

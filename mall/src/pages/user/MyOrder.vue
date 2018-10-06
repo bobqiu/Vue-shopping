@@ -3,7 +3,7 @@
 <transition name='bounce'>
     <div class="order-warp">
         <BaseTitle :back='back' title="我的订单" @goBack='goBack'/>
-        <Scroll :data='list' ref="scroll" class="scroll">
+        <Scroll v-show="!showFlag" :data='list' ref="scroll" class="scroll">
             <div class="wap">
                 <div class="list-warp" v-for="(value,key) in list" :key="key"> 
                     <div class='top border-bottom'>
@@ -19,13 +19,15 @@
                         </div>
                     </div>
                     <div class="timre bottom border-top">创建时间: {{value.createDate}}</div>
+                    <div class="bottom">收货地址: {{value.address}}</div>
                     <div class="bottom">共{{value.orderList.length}}件商品   合计: {{value.totalPrice}}</div>
                 </div>
             </div>
-            <div v-if="!list" class="null">
-                 {{userName? '暂无收藏~~' : '请先登录噢~~'}}
+            <div v-if="!list && !showFlag" class="null">
+                 {{userName&&!showFlag? '暂无订单~~' : '请先登录噢~~'}}
             </div>
          </Scroll>
+         <BaseLoding :showFlag='showFlag'/>
     </div>
 </transition>  
 </template>
@@ -36,7 +38,9 @@ import GoodsList from 'pages/other/GoodsList'
 import Scroll from 'pages/other/Scroll'
 import axios from 'axios'
 import {mapGetters} from 'vuex'
+import {loading} from 'js/mixin'
 export default {
+    mixins: [loading],
     data() {
         return {
             back: true,
@@ -61,8 +65,14 @@ export default {
         },
 
         async getMyOrder() {
+            if (!this.userName) {
+                this.showFlag = false
+                return
+            }
+            this.showFlag = true
             const res = await axios.get('/api/myOrder')
             if (res.data.status == 200) {
+                this.showFlag = false
                 this.list = res.data.list
             }
         }

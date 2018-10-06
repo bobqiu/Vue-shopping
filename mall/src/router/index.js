@@ -10,6 +10,7 @@ import Address from 'pages/user/address'
 import AddressEdit from 'pages/user/AddressEdit'
 import Collection from 'pages/user/Collection'
 import MyOrder from 'pages/user/MyOrder'
+import City from 'pages/city/City'
 import ShoppingPayMent from 'pages/shoppingCart/components/ShoppingPayMent'
 
 import Browse from 'pages/browse/Browse'
@@ -19,7 +20,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     { path: '/', redirect: '/home' },
-    { path: '/home', name: 'Home', component: Home, children: [{ path: ':id', component: Details }] },
+    { path: '/home', name: 'Home', component: Home, children: [{ path: '/city', component: City }, { path: ':id', component: Details }] },
     { path: '/category', name: 'Category', component: Category, children: [{ path: ':id', component: Details }] },
     { path: '/shoppingCart', name: 'ShoppingCart', component: ShoppingCart, children: [{ path: '/shoppingCart/ShoppingPayMent', component: ShoppingPayMent }] },
     { path: '/user/login', name: 'Login', component: Login }, // 登入

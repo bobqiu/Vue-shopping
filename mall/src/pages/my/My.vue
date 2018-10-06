@@ -11,25 +11,6 @@
       <p class="usename">欢迎您：{{userName}}</p>
       <p @click="loginOut">退出登录</p>
     </div>
-    <!-- <van-row class="user-links">
-      <van-col span="6">
-        <van-icon name="pending-payment" />
-        待付款
-      </van-col>
-      <van-col span="6">
-        <van-icon name="pending-orders" />
-        待接单
-      </van-col>
-      <van-col span="6">
-        <van-icon name="pending-deliver" />
-        待发货
-      </van-col>
-      <van-col span="6">
-        <van-icon name="logistics" />
-        待发货
-      </van-col>
-    </van-row> -->
-
     <van-cell-group class="user-group">
       <van-cell icon="records" title="全部订单" is-link @click="myOrder"/>
     </van-cell-group>
@@ -88,7 +69,8 @@ export default {
       axios.post('/api/loginOut').then(res => {
         console.log(res.data);
         if (res.data.status == 0) {
-          this.setName('')
+          window.location.reload();
+          localStorage.clear();
         }
       })
     },

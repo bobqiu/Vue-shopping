@@ -2,7 +2,7 @@
     <div class="card">
         <BaseTitle title="购物车"/>
         <Scroll :data='shopList' class="scroll" ref="scroll" v-show="shopList && shopList.length">
-            <ul class="ul">
+            <ul class="ul" v-show="!showFlag">
                 <div class="pics border-bottom" v-show="shopList.length">
                     <div  class="quanxuan">
                         <input id="select" type="checkbox" @change="change" v-model="allCheck"/>
@@ -38,7 +38,7 @@
 
             </ul>
          </Scroll>
-        <div class="shop-warpper"  v-show="!shopList.length">
+        <div class="shop-warpper"  v-show="!shopList.length && !showFlag">
             <div class="shop">
               <img :src="noShop" alt="">
             </div>
@@ -46,14 +46,8 @@
             <p class="desc2" @click='goshop' v-if="userName">去购物</p>
             <p class="desc2" @click='goLogin' v-else>去登录</p>
         </div>
-            <!-- 为你推荐 -->
-            <!-- <div :style="!shopList.length?'margin-top:40px':''">
-                <Title :floorName='floorName'/>
-                <div style="background:#ECECEC">
-                    <Panl/>
-                </div>
-            </div> -->
         <router-view />
+    <BaseLoding :showFlag='showFlag'/>
     </div>
 </template>
 
@@ -65,7 +59,9 @@ import axios from "axios";
 import Scroll from 'pages/other/Scroll'
 import BaseTitle from "pages/other/BaseTitle";
 import {mapMutations,mapGetters} from 'vuex'
+import {loading} from 'js/mixin'
 export default {
+    mixins: [loading],
   data() {
     return {
       shopList: "",
@@ -130,10 +126,13 @@ export default {
     },
 
     async getShopList() {
+        this.showFlag = true
       const res = await axios.get("/api/getCard");
       if (res.data.status == -1) {
         this.isLogin = true
+        this.showFlag = false
       } else {
+        this.showFlag = false
         this.shopList = res.data.shopList;
       }
     },

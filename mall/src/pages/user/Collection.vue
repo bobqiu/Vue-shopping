@@ -3,15 +3,16 @@
 <transition name='bounce'>
     <div class="browse-warp">
         <BaseTitle :back='back' title="我的收藏" @goBack='goBack'/>
-        <Scroll :data='list' class="scroll">
+        <Scroll v-show="!showFlag" :data='list' class="scroll">
             <div>
                 <GoodsList :list='list' :isCollection='isCollection' @datails='datails' @close='close'/>
             </div>
             <div v-if="!list.length" class="null">
-                 {{!isText? '暂无收藏~~' : '请先登录噢~~'}}
+                 {{userName&&!showFlag? '暂无收藏~~' : '请先登录噢~~'}}
             </div>
         </Scroll>
         <router-view/>
+         <BaseLoding :showFlag='showFlag'/>
     </div>
 </transition>     
 </template>
@@ -21,13 +22,19 @@ import Scroll from 'pages/other/Scroll'
 import BaseTitle from 'pages/other/BaseTitle'
 import GoodsList from 'pages/other/GoodsList'
 import axios from 'axios'
+import {loading} from 'js/mixin'
 import {Toast} from 'vant'
-import {mapActions,mapMutations} from 'vuex'
+import {mapActions,mapMutations,mapGetters} from 'vuex'
 export default {
+    mixins: [loading],
     components: {
         Scroll,
         BaseTitle,
         GoodsList,
+    },
+
+    computed: {
+        ...mapGetters(['userName'])
     },
 
     data() {
@@ -49,8 +56,14 @@ export default {
         },
 
         getCollection() {
+            if (!this.userName) {
+                this.showFlag = false
+                return
+            }
+            this.showFlag = true
             axios.get('/api/collection/list').then( res => {
                 if (res.data.status == 200) {
+                    this.showFlag = false
                     this.list = res.data.collection
                 } else {
                     this.isText = true
@@ -67,13 +80,13 @@ export default {
         },
 
         // 这里是取消收藏
-        close(item) {
+        close(item,index) {
             // this.deleteOne(item.id)
+            this.list.splice(index,1)
             axios.post('/api/cancelCollection',{id: item.id}).then(res => {
                 console.log(res);
                 if (res.data.status == 200) {
                     Toast(res.data.msg);
-                    this.getCollection()
                 }
             })
         },

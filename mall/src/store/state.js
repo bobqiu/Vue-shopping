@@ -6,6 +6,7 @@ const state = {
     addressInfo: address.getAddress(),    //  保存要修改的地址
     browse: recentlyBrowse.getBrowse(), // 最近浏览
     shopOrderList: [],      // 购物车去结算的时候存入vuex
+    temporaryAddress: '',   // 结算时候选择的地址
 }
 
 export default state

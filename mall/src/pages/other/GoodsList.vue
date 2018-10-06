@@ -1,6 +1,6 @@
 <template>
         <ul>
-        <li v-for="item in list" :key="item._id || item.id" class="good-item border-bottom" @click="details(item)">
+        <li v-for="(item,index) in list" :key="item._id || item.id" class="good-item border-bottom" @click="details(item)">
             <img :src="item.image || item.image_path" :onerror="defaultImg" :class="{img2:isBrowse || isCollection || isOrder}">
             <div>
                 <p class="p1">{{item.name}}</p>
@@ -11,7 +11,7 @@
                     <span class="count" v-if="isOrder">x{{item.count}}</span>
                 </p>
                 <div class="icon" v-if="isBrowse || isCollection">
-                    <van-icon name="close" class="close" @click.stop="close(item)"/>
+                    <van-icon name="close" class="close" @click.stop="close(item,index)"/>
                 </div>
             </div>
         </li>
@@ -64,8 +64,8 @@ export default {
         },
 
         // 清除单条浏览记录
-        close(item) {
-            this.$emit('close',item)
+        close(item,index) {
+            this.$emit('close',item,index)
         }
     }
 }

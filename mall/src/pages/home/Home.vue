@@ -1,9 +1,11 @@
 <template>
  <div>
-         <div class="home">
+    <div class="home">
         <div class="header">
             <van-row>
+                <div @click="cityClick" >
                 <van-col span="4" class="city">重庆市<van-icon name="arrow-left" class="icon"/></van-col>
+                </div>
                 <van-col span="20">
                     <van-search
                         v-model="value"
@@ -16,7 +18,7 @@
                 </van-col>
             </van-row>
         </div>
-    <div class="content" @touchmove.prevent='touchmove' @touchstart.prevent='touchstart' @touchend.prevent='touchend'>
+    <div v-show="!showFlag" class="content" @touchmove.prevent='touchmove' @touchstart.prevent='touchstart' @touchend.prevent='touchend'>
         <Scroll :listenScroll='listenScroll' @scroll='scroll' :probeType='probeType'  :data='recommend.hotGoods' class="content-scroll" :bounce='bounce' ref="scroll">
             <div>
                 <div class="swiper">
@@ -49,6 +51,7 @@
          <BaseRefresh :opacity='opac' :transformY='transformY' :rotate='rotate' :isRotate='isRotate' :trans='trans'/>
      </div>
 </div>
+     <BaseLoding :showFlag='showFlag'/>
      <router-view/>
 
  </div>
@@ -63,10 +66,12 @@ import HomeHot from './components/HomeHot'
 import Scroll from 'pages/other/Scroll'
 import BaseRefresh from 'pages/other/BaseRefresh'
 import {mapActions,mapMutations} from 'vuex'
+import {loading} from 'js/mixin'
 import { Search, Row, Col,Swipe, SwipeItem ,Lazyload ,Icon } from 'vant';
 import Vue from 'vue'
 Vue.use(Search).use(Row).use(Col).use(Swipe).use(SwipeItem).use(Lazyload).use(Icon)
 export default {
+    mixins: [loading],
     data() {
         return {
             value: '',
@@ -86,7 +91,7 @@ export default {
             rotate: 0,
             isRotate: false,
             trans: false,
-            opac: 0
+            opac: 0,
         }
     },
     
@@ -174,11 +179,18 @@ export default {
 
         ...mapMutations({
             setGoodDetails: 'GOODSDETAILS'
-        })
+        }),
+
+        cityClick() {
+            this.$router.push({path: '/city'})
+        }
     },
+    
     created() {
+         this.showFlag = true
         axios.get('/api/recommend').then( res => {
             if (res.data.code == 200) {
+                this.showFlag = false
                 const data = res.data.data
                 this.recommend = data
                 this.advertesPicture = data.advertesPicture.PICTURE_ADDRESS

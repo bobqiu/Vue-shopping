@@ -62,7 +62,6 @@ export default {
     }else if(fullPath=== '/shoppingCart/ShoppingPayMent') {
         this.payMent = false
     } 
-    
     axios.post('/api/keeplogin').then( res => {
       if (res.data.status == 1) {
         this.setName(res.data.username)
@@ -71,8 +70,6 @@ export default {
   },
   watch: {
     $route(to,from){
-      console.log(to.path);
-      console.log(from.path);
       if (to.path === '/home' || to.path == '/') {
         this.active = 0
       }

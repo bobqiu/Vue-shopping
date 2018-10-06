@@ -40,7 +40,8 @@ app.use(async (ctx,next) => {
       return
     }
     ctx.body = {
-      msg: '请登录'
+      msg: '请登录',
+      status: -1
     }
   } else {
     await next()

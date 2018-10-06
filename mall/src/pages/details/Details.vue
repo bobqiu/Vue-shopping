@@ -1,6 +1,7 @@
 <template>
 <transition name='bounce'>
-  <div class="goods">
+  <div class="goods" >
+    <div >
     <van-swipe class="goods-swipe" :autoplay="3000">
       <van-swipe-item >
         <img :src="goods.image" :onerror="defaultImg">
@@ -9,7 +10,7 @@
         <img :src="goods.image" :onerror="defaultImg">
       </van-swipe-item>
     </van-swipe>
-
+    <div v-show="!showFlag">
     <van-cell-group>
       <van-cell>
         <div class="goods-title">{{ goods.name }}</div>
@@ -83,7 +84,7 @@
         立即购买
       </van-goods-action-big-btn>
     </van-goods-action>
-    <Back/>
+    
     <transition name='bounce2'>
       <div class="sku" v-show="showBase" :class="{sku2:showBase}">
         <van-icon name="close" class="close" @click="showBase=false"/>
@@ -110,6 +111,10 @@
     <transition name="fade">
         <div class="sku-layer" v-show="showBase" @click="showBase=false"></div>
     </transition>
+    </div>
+    </div>
+    <BaseLoding :showFlag='showFlag'/>
+    <Back/>
   </div>
   </transition>  
 </template>
@@ -131,11 +136,13 @@ import {
   Tab, Tabs,Sku
 } from 'vant';
 import Back from 'pages/other/Back'
+import {loading} from 'js/mixin'
 Vue.use(Tab).use(Tabs).use(Sku)
 import {mapGetters,mapActions} from 'vuex'
 import axios from 'axios'
 import AdditionAndSubtraction from 'pages/other/AdditionAndSubtraction'
 export default {
+  mixins: [loading],
   components: {
     [Tag.name]: Tag,
     [Col.name]: Col,
@@ -192,15 +199,19 @@ export default {
 
     // 查询是否已收藏
     async isCollection(id) {
+      this.showFlag = true
       const res = await axios.post(`/api/isCollection`,{id})
       if (res.data.status == 200) {
+        this.showFlag = false
         if (res.data.isCollection == 1) {   // 已经收藏收藏
             this.isCollectionFlag = false
         } else {
             this.isCollectionFlag = true
         }
+      
       } else {
-          this.isCollectionFlag = true
+        this.showFlag = false
+        this.isCollectionFlag = true
       }
     },
 

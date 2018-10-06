@@ -22,7 +22,7 @@ const userSchema = new Schema({
         name: String,               // 收货人姓名
         tel: String,                // 电话
         address: String,            // 详细地址
-        isDefault: String,          // 是否默认,
+        isDefault: Boolean,          // 是否默认,
         province: String,           // 省
         city: String,               // 城市
         county: String,             // 区

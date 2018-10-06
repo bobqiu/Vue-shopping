@@ -437,6 +437,8 @@ router.post('/order', async (ctx, next) => {
   }
   if (!order.order[orderId]) {
     order.order[orderId] = {
+      address: data.address,
+      tel: data.tel,
       orderList: newData,
       totalPrice: data.totalPrice,
       createDate,

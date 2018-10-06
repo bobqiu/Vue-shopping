@@ -2,7 +2,7 @@
 <transition name='bounce'>
         <div class="address">
         <BaseTitle title="地址列表" :back='back' @goBack='goBack'/>
-            <Scroll :data='list' class="scroll">
+            <Scroll :data='list' class="scroll"  v-show="!showFlag">
                 <div>
                     <van-address-list
                         v-model="chosenAddressId"
@@ -16,6 +16,7 @@
                 </div>
             </Scroll>
         <div class="add" @click="onAdd">新增地址</div>
+        <BaseLoding :showFlag='showFlag'/>
         </div>
 </transition>  
 </template>
@@ -26,9 +27,11 @@ import BaseTitle from 'pages/other/BaseTitle'
 import Vue from 'vue'
 Vue.use(AddressList).use(Toast )
 import Scroll from 'pages/other/Scroll'
-import {mapActions} from 'vuex'
+import {mapActions,mapMutations} from 'vuex'
 import axios from 'axios'
+import {loading} from 'js/mixin'
 export default {
+    mixins: [loading],
     components: {
         BaseTitle,
         Scroll,
@@ -38,7 +41,8 @@ export default {
         return {
             back: true, // 是否显示返回按钮
             chosenAddressId: '1',
-            list: []
+            list: [],
+            isPay: false
         }
     },
 
@@ -57,18 +61,41 @@ export default {
         },
 
         onSelect(item) {
-            console.log(item);
+            this.setAddress2(item)
+            if (this.isPay) {   // 判断是不是从订单页面过来的
+                setTimeout(() => {
+                    this.$router.go(-1)
+                }, 500);
+            }
         },
         
-        ...mapActions(['setAddress'])
+        ...mapActions(['setAddress']),
+        
+        ...mapMutations({
+            setAddress2: 'TEMPORARYADDRESS'
+        })
+        
     },
 
     async created() {
+        this.showFlag = true
         const res = await axios.get('/api/getAddress')
         if (res.data.status == 200) {
+            this.showFlag = false
             this.list = res.data.address.reverse()
+            this.setAddress2( this.list[0])  // 默认第一条作为收货地址
         }
     },
+
+    beforeRouteEnter (to, from,next) {
+        next(vm => {
+            if (from.fullPath == "/shoppingCart/ShoppingPayMent") {
+                vm.isPay = true
+            console.log(vm.isPay);
+            }
+            // 通过 `vm` 访问组件实例
+        })
+    }
     }
 </script>
 

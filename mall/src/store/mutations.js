@@ -17,6 +17,9 @@ const matutaions = {
     },
     [types.SHOPORDERLIST](state,shopOrderList) {
         state.shopOrderList = shopOrderList
+    },
+    [types.TEMPORARYADDRESS](state,temporaryAddress) {
+        state.temporaryAddress = temporaryAddress
     }
 }
 

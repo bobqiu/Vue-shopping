@@ -4,11 +4,14 @@
     <div class="order">
         <BaseTitle :back='back' title="订单结算" @goBack='goBack'/>
                 <div class="address-warp">
-                    <div class="address">
+                    <div class="address addnull" v-if="!temporaryAddress.id" @click="goAddress">
+                        点击添加收获地址
+                    </div>
+                    <div class="address" v-else @click="editAddress">
                         <div class="icon"><van-icon name="location" class="location"/></div>
                         <div class="address-cont">
-                            <p class="name">收货人: 小白白 <span>18685459561</span></p>
-                            <p class="address-e">收货地址: 时刻让对方感觉可能都好几个迪瑞克斯很感激你看电视剧都是几点回来开会决定离开</p>
+                            <p class="name">收货人: {{temporaryAddress.name}} <span>{{temporaryAddress.tel}}</span></p>
+                            <p class="address-e">收货地址: {{temporaryAddress.address}}</p>
                             <p class="no">(收货不便时,可选择免费待收货服务)</p>
                         </div>
                         <div class="icon2"><van-icon name="arrow" class="location"/></div>
@@ -23,12 +26,12 @@
         
         <div v-if="shopOrderList && shopOrderList.length">
             <van-submit-bar
+                :loading='isLoading'
                 :price="price"
                 button-text="提交订单"
                 @submit="onSubmit"
             />
         </div>
-
     </div>
 </transition>      
 </template>
@@ -50,7 +53,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(['shopOrderList']),
+        ...mapGetters(['shopOrderList','temporaryAddress']),
 
         price() {
             let num = 0
@@ -68,6 +71,8 @@ export default {
             back: true,
             caitiao: require('img/caitiao.jpg'),
             isOrder: true,
+            isLoading: false,
+            list: []
         }
     },
 
@@ -80,6 +85,11 @@ export default {
         },
 
         async onSubmit() {
+            if (!this.temporaryAddress.id) {
+                Toast('请添加收获地址')
+                return
+            }
+            this.isLoading = true
             // 传地址id，订单id，和总价格
             let Addressid = 123456745;
             let orderId = []
@@ -87,11 +97,13 @@ export default {
                 orderId.push(item.id)
             })
             const res = await axios.post('/api/order',{
-                Addressid,
+                address: this.temporaryAddress.address,
+                tel: this.temporaryAddress.tel,
                 orderId,
                 totalPrice: (this.price / 100).toFixed(2)
             })
             if (res.data.status == 200) {
+                this.isLoading = false
                 Toast(`结算成功,一共${(this.price / 100).toFixed(2)}元`)
                 setTimeout(() => {
                     this.setShopList([])
@@ -102,7 +114,17 @@ export default {
 
         ...mapMutations({
             setShopList: 'SHOPORDERLIST'
-        })
+        }),
+
+        // 添加收货地址
+        goAddress() {
+            this.$router.push({path: '/user/address'})
+        },
+
+        // 选择地址
+        editAddress() {
+            this.$router.push({path:'/user/address'})
+        }
     }
 }
 </script>
@@ -126,6 +148,11 @@ export default {
     .address-warp
         .caitiao
             margin-top -10px
+        .addnull
+            align-items center
+            padding 0!important   
+            justify-content center
+            font-size 14px
         .address
             display flex
             height 90px
