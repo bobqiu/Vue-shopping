@@ -39,20 +39,23 @@
 - [x] 加入购物车
 - [x] 购物车选择商品结算，数量增加、修改、删除
 - [x] 订单的支付与查询
-- [ ] 城市选择
-- [ ] 搜索功能
+- [x] 城市选择 / 城市搜索
+- [ ] 商品搜索功能
 - [ ] 商品评论
 
 ## 截图
-![8.png](./images/8.png)
-![5.png](./images/5.png)
+![1.png](./images/1.png)
+![2.png](./images/2.png)
 ![3.png](./images/3.png)
 ![4.png](./images/4.png)
-![2.png](./images/2.png)
+![5.png](./images/5.png)
 ![6.png](./images/6.png)
 ![7.png](./images/7.png)
-![1.png](./images/1.png)
-
+![8.png](./images/8.png)
+![9.png](./images/9.png)
+![10.png](./images/10.png)
+![11.png](./images/11.png)
+![12.png](./images/12.png)
 
 
 ## 项目说明

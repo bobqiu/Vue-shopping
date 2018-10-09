@@ -1,4 +1,4 @@
-import {tab,address,recentlyBrowse} from 'js/cache'
+import {tab,address,recentlyBrowse,city} from 'js/cache'
 const state = {
     category: tab.getTab(),   //分类条目
     goodsDetails: {},   // 商品详情
@@ -7,6 +7,7 @@ const state = {
     browse: recentlyBrowse.getBrowse(), // 最近浏览
     shopOrderList: [],      // 购物车去结算的时候存入vuex
     temporaryAddress: '',   // 结算时候选择的地址
+    city: city.getCity(),
 }
 
 export default state

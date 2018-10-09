@@ -20,6 +20,9 @@ const matutaions = {
     },
     [types.TEMPORARYADDRESS](state,temporaryAddress) {
         state.temporaryAddress = temporaryAddress
+    },
+    [types.CITY](state,city) {
+        state.city = city
     }
 }
 

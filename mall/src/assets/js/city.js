@@ -12,19 +12,19 @@ export default {
 		}, {
 			"id": 47,
 			"spell": "xian",
-			"name": "西安"
+			"name": "杭州"
 		}, {
 			"id": 239,
 			"spell": "sanya",
-			"name": "三亚"
+			"name": "重庆"
 		}, {
 			"id": 188,
 			"spell": "lijiang",
-			"name": "丽江"
+			"name": "成都"
 		}, {
 			"id": 125,
 			"spell": "guilin",
-			"name": "桂林"
+			"name": "厦门"
 		}],
 		"cities": {
 			"A": [{

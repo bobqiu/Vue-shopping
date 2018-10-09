@@ -9,6 +9,7 @@ Vue.use(Tabbar).use(TabbarItem)
 // 解决300毫秒延时
 import FastClick from 'fastclick'
 FastClick.attach(document.body)
+import 'babel-polyfill'
 import 'vant/lib/vant-css/index.css'
 import 'css/reset.css'
 import 'swiper/dist/css/swiper.css'

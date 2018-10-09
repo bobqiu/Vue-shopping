@@ -3,6 +3,7 @@ import storage from 'good-storage'
 const TAB_LIST = 'tab'      // TAB 
 const ADDRESS = 'address'     // 地址列表
 const RECENTLY_BROWSE = 'browse'  // 最近浏览
+const CITY = 'city'
 export const tab = {
     getTab() {
         return storage.get(TAB_LIST,[])
@@ -64,5 +65,16 @@ export const recentlyBrowse = {
         data.splice(index,1)
         storage.set(RECENTLY_BROWSE,data)
         return data
+    }
+}
+
+// 缓存城市
+export const city = {
+    getCity() {
+        return storage.get(CITY,'北京市')
+    },
+
+    setCity(city) {
+        return storage.set(CITY,city)
     }
 }

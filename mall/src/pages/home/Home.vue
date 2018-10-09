@@ -4,9 +4,9 @@
         <div class="header">
             <van-row>
                 <div @click="cityClick" >
-                <van-col span="4" class="city">重庆市<van-icon name="arrow-left" class="icon"/></van-col>
+                <van-col span="5" class="city">{{city}} ▼</van-col>
                 </div>
-                <van-col span="20">
+                <van-col span="19">
                     <van-search
                         v-model="value"
                         placeholder="请输入搜索关键词"
@@ -65,7 +65,7 @@ import HomeFoor from './components/HomeFoor'
 import HomeHot from './components/HomeHot'
 import Scroll from 'pages/other/Scroll'
 import BaseRefresh from 'pages/other/BaseRefresh'
-import {mapActions,mapMutations} from 'vuex'
+import {mapActions,mapMutations,mapGetters} from 'vuex'
 import {loading} from 'js/mixin'
 import { Search, Row, Col,Swipe, SwipeItem ,Lazyload ,Icon } from 'vant';
 import Vue from 'vue'
@@ -92,6 +92,7 @@ export default {
             isRotate: false,
             trans: false,
             opac: 0,
+            currentCity: ''
         }
     },
     
@@ -102,6 +103,11 @@ export default {
         Scroll,
         BaseRefresh,
     },
+
+    computed: {
+        ...mapGetters(['city'])
+    },
+
     methods: {
         onSearch() {
             console.log('搜索');
@@ -183,23 +189,32 @@ export default {
 
         cityClick() {
             this.$router.push({path: '/city'})
+        },
+
+        getHome() {
+            this.showFlag = true
+            axios.get('/api/recommend').then( res => {
+                if (res.data.code == 200) {
+                    this.showFlag = false
+                    const data = res.data.data
+                    this.recommend = data
+                    this.advertesPicture = data.advertesPicture.PICTURE_ADDRESS
+                    this.floorName = data.floorName
+                    this.setTab(data.category)
+                }
+            })
         }
     },
     
     created() {
-         this.showFlag = true
-        axios.get('/api/recommend').then( res => {
-            if (res.data.code == 200) {
-                this.showFlag = false
-                const data = res.data.data
-                this.recommend = data
-                this.advertesPicture = data.advertesPicture.PICTURE_ADDRESS
-                this.floorName = data.floorName
-                this.setTab(data.category)
-            }
-            
-        })
+        this.getHome()
     },
+
+    watch: {
+        city() {
+            this.getHome()
+        }
+    }
 }
 </script>
 <style lang="less" scoped>
@@ -211,8 +226,9 @@ export default {
     .city {
         text-align: center;
         background: @color;
-        font-size: 14px;
+        font-size: 12px;
         position: relative;
+        max-width: 120px;
         .icon {
             transform: rotate(270deg);
             position: absolute;

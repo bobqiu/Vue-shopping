@@ -5,4 +5,6 @@ export const ADDRESSINFO = 'ADDRESSINFO'
 export const BROWSE = 'BROWSE'
 export const SHOPORDERLIST = 'SHOPORDERLIST'
 export const TEMPORARYADDRESS = 'TEMPORARYADDRESS'
+export const CITY = 'CITY'
+
 

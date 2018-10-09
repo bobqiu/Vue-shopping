@@ -121,3 +121,6 @@ input[type=checkbox]:checked::after {
 	-webkit-transform: rotate(-45deg);
 	transform: rotate(-45deg);
 }
+.home .van-search {
+	padding-left: 0;
+}
