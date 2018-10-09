@@ -4,7 +4,7 @@
     <div class="order">
         <BaseTitle :back='back' title="订单结算" @goBack='goBack'/>
                 <div class="address-warp">
-                    <div class="address addnull" v-if="!temporaryAddress.id" @click="goAddress">
+                    <div class="address addnull" v-if=" !temporaryAddress || !temporaryAddress.id" @click="goAddress">
                         点击添加收获地址
                     </div>
                     <div class="address" v-else @click="editAddress">
@@ -40,11 +40,8 @@
 import GoodsList from 'pages/other/GoodsList'
 import BaseTitle from 'pages/other/BaseTitle'
 import {mapGetters,mapMutations} from 'vuex'
-import { Icon ,SubmitBar,Toast } from 'vant';
 import Scroll from 'pages/other/Scroll'
-import Vue from 'vue'
-import axios from 'axios'
-Vue.use(Icon).use(SubmitBar)
+import {Toast} from 'vant'
 export default {
     components: {
         BaseTitle,
@@ -85,7 +82,7 @@ export default {
         },
 
         async onSubmit() {
-            if (!this.temporaryAddress.id) {
+            if (!this.temporaryAddress || !this.temporaryAddress.id) {
                 Toast('请添加收获地址')
                 return
             }
@@ -96,7 +93,7 @@ export default {
             this.shopOrderList.forEach( item => {
                 orderId.push(item.id)
             })
-            const res = await axios.post('/api/order',{
+            const res = await this.$http.post('/api/order',{
                 address: this.temporaryAddress.address,
                 tel: this.temporaryAddress.tel,
                 orderId,

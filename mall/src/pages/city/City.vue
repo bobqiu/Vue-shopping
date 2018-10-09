@@ -52,7 +52,6 @@
 import BaseTitle from "pages/other/BaseTitle";
 import CityRight from "./components/CityRight";
 import Scroll from "pages/other/Scroll";
-import Vue from "vue";
 import city from "js/city";
 import {mapActions,mapGetters} from 'vuex'
 import {throttle} from 'js/util'

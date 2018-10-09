@@ -26,12 +26,7 @@
 
 <script>
 import Back from 'pages/other/Back'
-import { Button } from 'vant';
-import { Toast } from 'vant';
-import Vue from 'vue'
-Vue.use(Button);
 import {mapMutations} from 'vuex'
-import axios from 'axios'
 export default {
     data() {
         return {
@@ -62,7 +57,7 @@ export default {
         async register(flag) {
             if (flag) { //  注册
                 this.regLoding = true
-                const res = await axios.post('/api/register',{
+                const res = await this.$http.post('/api/register',{
                     username: this.username,
                     password: this.username
                 })
@@ -76,7 +71,7 @@ export default {
                 Toast(res.data.msg);
             } else {    // 登录
                 this.loginLoding = true
-                const res = await axios.post('/api/login',{
+                const res = await this.$http.post('/api/login',{
                     username: this.username,
                     password: this.username
                 })

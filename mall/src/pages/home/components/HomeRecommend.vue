@@ -21,10 +21,8 @@
 <script>
 import Vue from 'vue';
 import VueAwesomeSwiper from 'vue-awesome-swiper' //轮播图
-import {  Icon  } from 'vant';
-Vue.use(VueAwesomeSwiper).use(Icon )
+Vue.use(VueAwesomeSwiper)
 import {details} from 'js/mixin'
-import axios from 'axios'
 import {mapGetters} from 'vuex'
 import {Toast} from 'vant'
 export default {
@@ -55,7 +53,7 @@ export default {
                 this.$router.push({path:'/user/login'})
                 return
             }
-            const res = await axios.post('/api/addShop',{
+            const res = await this.$http.post('/api/addShop',{
                 id: val.goodsId
             })            
             if (res.data.status == 200) {

@@ -52,10 +52,6 @@
 </template>
 
 <script>
-import Vue from "vue";
-import { Toast ,Dialog,Checkbox,SubmitBar} from "vant";
-Vue.use(SubmitBar).use(Checkbox).use(Dialog)
-import axios from "axios";
 import Scroll from 'pages/other/Scroll'
 import BaseTitle from "pages/other/BaseTitle";
 import {mapMutations,mapGetters} from 'vuex'
@@ -127,7 +123,7 @@ export default {
 
     async getShopList() {
         this.showFlag = true
-      const res = await axios.get("/api/getCard");
+      const res = await this.$http.get("/api/getCard");
       if (res.data.status == -1) {
         this.isLogin = true
         this.showFlag = false
@@ -155,7 +151,7 @@ export default {
         val.count++
       }
 
-      const res = await axios.post("/api/editCart", {
+      const res = await this.$http.post("/api/editCart", {
           count: val.count,
           id: val.id,
           mallPrice: (val.present_price * val.count).toFixed(2)
@@ -180,7 +176,7 @@ export default {
 
     // 删除购物车商品
     async deleteShop(id) {
-        const res = await axios.post('/api/deleteShop',id)
+        const res = await this.$http.post('/api/deleteShop',id)
         if (res.data.status == 200) {
             Toast(res.data.msg)
             this.getShopList()

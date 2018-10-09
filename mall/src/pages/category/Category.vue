@@ -33,12 +33,8 @@
 </template>
 <script>
 import {mapGetters,mapMutations,mapActions} from 'vuex'
-import { Tab, Tabs  } from 'vant';
-import axios from 'axios'
-import Vue from 'vue'
 import Scroll from 'pages/other/Scroll'
 import GoodsList from 'pages/other/GoodsList'
-Vue.use(Tab).use(Tabs)
 import BaseTitle from 'pages/other/BaseTitle'
 import {loading} from 'js/mixin'
 export default {
@@ -90,7 +86,7 @@ export default {
 
         getList(id) {
             this.showFlag = true
-            axios.get(`/api/classification?mallSubId=${id}`).then(res => {
+            this.$http.get(`/api/classification?mallSubId=${id}`).then(res => {
                 if (res.data.code == 200) {
                     this.showFlag = false
                     this.dataList =  res.data.dataList

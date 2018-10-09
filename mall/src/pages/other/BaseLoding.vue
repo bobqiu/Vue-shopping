@@ -10,7 +10,6 @@
 <script>
 import {mapGetters} from 'vuex'
 export default {
-
     props: {
         showFlag: {
             type: Boolean,

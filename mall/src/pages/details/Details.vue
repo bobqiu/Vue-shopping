@@ -120,40 +120,15 @@
 </template>
 
 <script>
-import Vue from 'vue'
-import {
-  Tag,
-  Col,
-  Icon,
-  Cell,
-  CellGroup,
-  Swipe,
-  Toast,
-  SwipeItem,
-  GoodsAction,
-  GoodsActionBigBtn,
-  GoodsActionMiniBtn,
-  Tab, Tabs,Sku
-} from 'vant';
+
 import Back from 'pages/other/Back'
 import {loading} from 'js/mixin'
-Vue.use(Tab).use(Tabs).use(Sku)
 import {mapGetters,mapActions} from 'vuex'
-import axios from 'axios'
 import AdditionAndSubtraction from 'pages/other/AdditionAndSubtraction'
+import {Toast} from 'vant'
 export default {
   mixins: [loading],
   components: {
-    [Tag.name]: Tag,
-    [Col.name]: Col,
-    [Icon.name]: Icon,
-    [Cell.name]: Cell,
-    [CellGroup.name]: CellGroup,
-    [Swipe.name]: Swipe,
-    [SwipeItem.name]: SwipeItem,
-    [GoodsAction.name]: GoodsAction,
-    [GoodsActionBigBtn.name]: GoodsActionBigBtn,
-    [GoodsActionMiniBtn.name]: GoodsActionMiniBtn,
     Back,
     AdditionAndSubtraction
   },
@@ -188,7 +163,7 @@ export default {
             this.goods = this.goodsDetails
             return
         }
-        const res = await axios.get(`/api/goods/one?id=${this.goodsDetails.goodsId}`)
+        const res = await this.$http.get(`/api/goods/one?id=${this.goodsDetails.goodsId}`)
         if (res.data.code == 200) {
             if (res.data.goodsOne.id) {
               this.setBrowse(res.data.goodsOne)
@@ -200,7 +175,7 @@ export default {
     // 查询是否已收藏
     async isCollection(id) {
       this.showFlag = true
-      const res = await axios.post(`/api/isCollection`,{id})
+      const res = await this.$http.post(`/api/isCollection`,{id})
       if (res.data.status == 200) {
         this.showFlag = false
         if (res.data.isCollection == 1) {   // 已经收藏收藏
@@ -224,13 +199,13 @@ export default {
       if (this.isCollectionFlag) {  // 收藏
         let goods = this.goods
         delete(goods['_id'])  
-        const res = await axios.post('/api/collection',goods)
+        const res = await this.$http.post('/api/collection',goods)
         if (res.data.status == 200) { // 收藏成功
           Toast(res.data.msg);
           this.isCollectionFlag = false
         }
       } else {  // 取消收藏
-        const res = await axios.post('/api/cancelCollection',{
+        const res = await this.$http.post('/api/cancelCollection',{
           id: this.goods.id
         })
         if (res.data.status == 200) { // 收藏成功
@@ -244,7 +219,7 @@ export default {
                 this.$router.push({path:'/user/login'})
                 return
             }
-            const res = await axios.post('/api/addShop',{
+            const res = await this.$http.post('/api/addShop',{
                 id: this.goodsDetails.goodsId || this.goodsDetails.id
             })            
             if (res.data.status == 200) {

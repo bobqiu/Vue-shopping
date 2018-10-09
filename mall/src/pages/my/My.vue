@@ -26,16 +26,9 @@
 
 <script>
 import BaseTitle from 'pages/other/BaseTitle'
-import { Row, Col, Icon, Cell, CellGroup } from 'vant'
 import {mapGetters,mapMutations} from 'vuex'
-import axios from 'axios'
 export default {
   components: {
-    [Row.name]: Row,
-    [Col.name]: Col,
-    [Icon.name]: Icon,
-    [Cell.name]: Cell,
-    [CellGroup.name]: CellGroup,
     BaseTitle
   },
 
@@ -66,7 +59,7 @@ export default {
 
     // 退出登录
     loginOut() {
-      axios.post('/api/loginOut').then(res => {
+      this.$http.post('/api/loginOut').then(res => {
         console.log(res.data);
         if (res.data.status == 0) {
           window.location.reload();

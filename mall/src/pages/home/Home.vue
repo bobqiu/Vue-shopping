@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import HomeRecommend from './components/HomeRecommend'
 import HomeFoor from './components/HomeFoor'
 import HomeHot from './components/HomeHot'
@@ -67,9 +66,6 @@ import Scroll from 'pages/other/Scroll'
 import BaseRefresh from 'pages/other/BaseRefresh'
 import {mapActions,mapMutations,mapGetters} from 'vuex'
 import {loading} from 'js/mixin'
-import { Search, Row, Col,Swipe, SwipeItem ,Lazyload ,Icon } from 'vant';
-import Vue from 'vue'
-Vue.use(Search).use(Row).use(Col).use(Swipe).use(SwipeItem).use(Lazyload).use(Icon)
 export default {
     mixins: [loading],
     data() {
@@ -147,7 +143,7 @@ export default {
             } else {
                 this.touch.isRotate = false
                 if (this.transformY > 100) {
-                    axios.get('/api/recommend').then( res => {
+                    this.$http.get('/api/recommend').then( res => {
                         if (res.data.code == 200) {
                             const data = res.data.data
                             this.recommend = data
@@ -193,7 +189,7 @@ export default {
 
         getHome() {
             this.showFlag = true
-            axios.get('/api/recommend').then( res => {
+            this.$http.get('/api/recommend').then( res => {
                 if (res.data.code == 200) {
                     this.showFlag = false
                     const data = res.data.data

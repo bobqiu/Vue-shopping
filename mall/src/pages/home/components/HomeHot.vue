@@ -13,11 +13,8 @@
 
 <script>
 import Title from 'pages/other/Title'
-import Vue from 'vue';
-import { Lazyload } from 'vant';
 import {mapMutations} from 'vuex'
 import {details} from 'js/mixin'
-Vue.use(Lazyload);
 export default {
     mixins: [details],
     props:['hot'],

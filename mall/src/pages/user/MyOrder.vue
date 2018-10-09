@@ -36,7 +36,6 @@
 import BaseTitle from 'pages/other/BaseTitle'
 import GoodsList from 'pages/other/GoodsList'
 import Scroll from 'pages/other/Scroll'
-import axios from 'axios'
 import {mapGetters} from 'vuex'
 import {loading} from 'js/mixin'
 export default {
@@ -70,7 +69,7 @@ export default {
                 return
             }
             this.showFlag = true
-            const res = await axios.get('/api/myOrder')
+            const res = await this.$http.get('/api/myOrder')
             if (res.data.status == 200) {
                 this.showFlag = false
                 this.list = res.data.list

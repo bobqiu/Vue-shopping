@@ -6,9 +6,6 @@
 </template>
 
 <script>
-import { Icon } from 'vant';
-import Vue from 'vue'
-Vue.use(Icon);
 export default {
     props: {
         title: {

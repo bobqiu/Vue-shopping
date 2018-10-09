@@ -21,11 +21,8 @@
 
 <script>
 import BaseTitle from 'pages/other/BaseTitle'
-import { AddressEdit,Area,Toast  } from 'vant'
-import Vue from 'vue'
-Vue.use(AddressEdit).use(Area ).use(Toast)
 import {mapGetters,mapMutations,mapActions} from 'vuex'
-import axios from 'axios'
+import {Toast} from 'vant'
 export default {
     computed: {
         ...mapGetters(['addressInfo'])
@@ -52,7 +49,7 @@ export default {
 
     methods: {
         async onSave(val) {
-            const res = await axios.post('/api/address',{
+            const res = await this.$http.post('/api/address',{
                 name: val.name,
                 tel: val.tel,
                 address: val.province + val.city + val.county + val.addressDetail,
@@ -78,7 +75,7 @@ export default {
             
         },
         async onDelete(val) {
-            const res = await axios.post('/api/deleteAddress',{
+            const res = await this.$http.post('/api/deleteAddress',{
                 id: val.id
             })
             if (res.data.code == 200) {

@@ -21,8 +21,8 @@
 import Scroll from 'pages/other/Scroll'
 import BaseTitle from 'pages/other/BaseTitle'
 import GoodsList from 'pages/other/GoodsList'
-import axios from 'axios'
 import {loading} from 'js/mixin'
+
 import {Toast} from 'vant'
 import {mapActions,mapMutations,mapGetters} from 'vuex'
 export default {
@@ -61,7 +61,7 @@ export default {
                 return
             }
             this.showFlag = true
-            axios.get('/api/collection/list').then( res => {
+            this.$http.get('/api/collection/list').then( res => {
                 if (res.data.status == 200) {
                     this.showFlag = false
                     this.list = res.data.collection
@@ -83,7 +83,7 @@ export default {
         close(item,index) {
             // this.deleteOne(item.id)
             this.list.splice(index,1)
-            axios.post('/api/cancelCollection',{id: item.id}).then(res => {
+            this.$http.post('/api/cancelCollection',{id: item.id}).then(res => {
                 console.log(res);
                 if (res.data.status == 200) {
                     Toast(res.data.msg);

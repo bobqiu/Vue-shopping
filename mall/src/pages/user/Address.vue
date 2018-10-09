@@ -22,13 +22,9 @@
 </template>
 
 <script>
-import { AddressList,Toast  } from 'vant';
 import BaseTitle from 'pages/other/BaseTitle'
-import Vue from 'vue'
-Vue.use(AddressList).use(Toast )
 import Scroll from 'pages/other/Scroll'
 import {mapActions,mapMutations} from 'vuex'
-import axios from 'axios'
 import {loading} from 'js/mixin'
 export default {
     mixins: [loading],
@@ -79,7 +75,7 @@ export default {
 
     async created() {
         this.showFlag = true
-        const res = await axios.get('/api/getAddress')
+        const res = await this.$http.get('/api/getAddress')
         if (res.data.status == 200) {
             this.showFlag = false
             this.list = res.data.address.reverse()
