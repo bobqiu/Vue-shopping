@@ -94,7 +94,7 @@
             <p class="goods-name">{{goods.name}}</p>
             <p class="pic">
               <span>￥</span>
-              <span>{{goods.present_price * newCount}}</span>
+              <span>{{(goods.present_price * newCount).toFixed(2)}}</span>
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@
 
 import Back from 'pages/other/Back'
 import {loading} from 'js/mixin'
-import {mapGetters,mapActions} from 'vuex'
+import {mapGetters,mapActions,mapMutations} from 'vuex'
 import AdditionAndSubtraction from 'pages/other/AdditionAndSubtraction'
 import {Toast} from 'vant'
 export default {
@@ -239,8 +239,25 @@ export default {
     // 立即购买
     PurchaseImmediately() {
       console.log(this.newCount);
-      
+      console.log(this.goods);
+      let goods = [{
+        check:true,
+        count: this.newCount,
+        id: this.goods.id,
+        image_path: this.goods.image_path,
+        mallPrice: this.goods.present_price * this.newCount,
+        present_price: this.goods.present_price,
+        name: this.goods.name,
+        idDirect: true,
+        count: this.newCount
+      }]
+      this.$router.push({path: '/ShoppingPayMent'})
+      this.setShopList(goods)
     },
+
+     ...mapMutations({
+        setShopList: 'SHOPORDERLIST'
+    }),
 
     ...mapActions(['setBrowse'])
   },

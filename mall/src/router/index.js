@@ -22,12 +22,13 @@ export default new Router({
     { path: '/', redirect: '/home' },
     { path: '/home', name: 'Home', component: Home, children: [{ path: '/city', component: City }, { path: ':id', component: Details }] },
     { path: '/category', name: 'Category', component: Category, children: [{ path: ':id', component: Details }] },
-    { path: '/shoppingCart', name: 'ShoppingCart', component: ShoppingCart, children: [{ path: '/shoppingCart/ShoppingPayMent', component: ShoppingPayMent }] },
+    { path: '/shoppingCart', name: 'ShoppingCart', component: ShoppingCart },
     { path: '/user/login', name: 'Login', component: Login }, // 登入
     { path: '/user/address', name: 'Address', component: Address }, // 地址
     { path: '/user/addressEdit', name: 'AddressEdit', component: AddressEdit }, // 新增和编辑地址
     { path: '/user/collection', name: 'Collection', component: Collection, children: [{ path: ':id', component: Details }] }, // 我的收藏
     { path: '/my', name: 'My', component: My, children: [{ path: '/my/order', component: MyOrder }, { path: '/my/browse', component: Browse, children: [{ path: ':id', component: Details }] }] }, // 我的收藏
-    { path: '*', redirect: '/home' },
+    { path: '/shoppingPayMent', name: 'ShoppingPayMent', component: ShoppingPayMent },
+    { path: '*', redirect: '/home' }
   ]
 })

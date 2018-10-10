@@ -10,13 +10,12 @@
                     </div>
                     <div class="total">
                         <p>合计：<span>￥{{totalPrice}}</span></p>
-                        <p style="line-height:1.3" v-if="totalPrice<59">满59元配送，还差{{(59-totalPrice).toFixed(2)}}元才能结算噢</p>
-                        <p v-else>请确认订单</p>
+                        <p v-if="deleteFlag">请确认订单</p>
                     </div>
                 </div>
                 <div class="confirm"  v-show="shopList.length">
                     <div class="notijiao delete" v-if="deleteFlag"  @click="deletes">删除</div>
-                    <div class="notijiao delete" v-if="deleteFlag && totalPrice>=59" @click="placeOrder">去结算</div>
+                    <div class="notijiao delete" v-if="deleteFlag" @click="placeOrder">去结算</div>
                 </div>
                 <li class="border-bottom" v-for="val of shopList" :key="val.id">
                     <div class="left">
@@ -56,6 +55,7 @@ import Scroll from 'pages/other/Scroll'
 import BaseTitle from "pages/other/BaseTitle";
 import {mapMutations,mapGetters} from 'vuex'
 import {loading} from 'js/mixin'
+import {Dialog,Toast } from 'vant'
 export default {
     mixins: [loading],
   data() {
@@ -194,7 +194,7 @@ export default {
     // 提交订单
     placeOrder() {
         let id = []
-        this.$router.push({path: '/shoppingCart/ShoppingPayMent'})
+        this.$router.push({path: '/ShoppingPayMent'})
         this.shopList.forEach(item => {
             if (item.check) {
                 id.push(item)

@@ -97,7 +97,9 @@ export default {
                 address: this.temporaryAddress.address,
                 tel: this.temporaryAddress.tel,
                 orderId,
-                totalPrice: (this.price / 100).toFixed(2)
+                totalPrice: (this.price / 100).toFixed(2),
+                idDirect: this.shopOrderList[0].idDirect,
+                count: this.shopOrderList[0].count
             })
             if (res.data.status == 200) {
                 this.isLoading = false

@@ -429,11 +429,25 @@ router.post('/order', async (ctx, next) => {
   }
   // 根据id查询出购物车订单
   for (let i = 0; i < data.orderId.length; i++) {
-    let item = await userTest.aggregate([{ "$unwind": "$shopList" },
-    { "$match": { "shopList.id": data.orderId[i], username } },
-    { "$project": { "shopList": 1 } }])
-    newData[i] = item[0].shopList
-    newData[i].order_id = orderId + i
+    if (data.idDirect) {
+      const res = await GoodsList.findOne({ id: data.orderId[0] })
+      newData[i] = {
+        order_id: orderId + i,
+        count: data.count,
+        present_price: res.present_price,
+        id: res.id,
+        image_path: res.image_path,
+        name: res.namem,
+        mallPrice: data.totalPrice,
+      }
+    } else {
+      let item = await userTest.aggregate([{ "$unwind": "$shopList" },
+      { "$match": { "shopList.id": data.orderId[i], username } },
+      { "$project": { "shopList": 1 } }])
+      newData[i] = item[0].shopList
+      newData[i].order_id = orderId + i
+    }
+
   }
   if (!order.order[orderId]) {
     order.order[orderId] = {
@@ -442,7 +456,7 @@ router.post('/order', async (ctx, next) => {
       orderList: newData,
       totalPrice: data.totalPrice,
       createDate,
-      orderId
+      orderId,
     }
   }
   await userTest.update({ username }, {

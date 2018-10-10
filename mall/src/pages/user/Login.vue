@@ -27,6 +27,7 @@
 <script>
 import Back from 'pages/other/Back'
 import {mapMutations} from 'vuex'
+import {Toast} from 'vant'
 export default {
     data() {
         return {
